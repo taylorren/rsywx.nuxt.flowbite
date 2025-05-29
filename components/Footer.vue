@@ -13,35 +13,36 @@
                     <div>
                         <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">框架</h2>
                         <ul class="text-gray-500 dark:text-gray-400 font-medium">
-                            <li class="mb-4">
-                                <a href="https://flowbite.com/" class="hover:underline">Flowbite</a>
+                            <li class="mb-1">
+                                <a href="https://nuxt.com/" class="hover:underline">Nuxt</a>
                             </li>
-                            <li>
+                            <li class="mb-1">
                                 <a href="https://tailwindcss.com/" class="hover:underline">Tailwind CSS</a>
                             </li>
+                            <li>
+                                <a href="https://flowbite.com/" class="hover:underline">Flowbite</a>
+                            </li>
+
                         </ul>
                     </div>
                     <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Follow us</h2>
+                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">项目代码</h2>
                         <ul class="text-gray-500 dark:text-gray-400 font-medium">
                             <li class="mb-4">
-                                <a href="https://github.com/themesberg/flowbite" class="hover:underline ">Github</a>
-                            </li>
-                            <li>
-                                <a href="https://discord.gg/4eeurUVvTy" class="hover:underline">Discord</a>
+                                <a href="https://github.com/taylorren/rsywx.nuxt.flowbite"
+                                    class="hover:underline ">Github</a>
                             </li>
                         </ul>
                     </div>
                     <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Legal</h2>
-                        <ul class="text-gray-500 dark:text-gray-400 font-medium">
-                            <li class="mb-4">
-                                <a href="#" class="hover:underline">Privacy Policy</a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:underline">Terms &amp; Conditions</a>
-                            </li>
-                        </ul>
+                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">家庭成员</h2>
+                        <div class="flex">
+                            <img src="/images/tr.png" alt="老彼得爸" title="老彼得爸" class="w-16 h-16 rounded-full me-2">
+                            <img src="/images/gr.png" alt="老彼得妈" title="老彼得妈" class="w-16 h-16 rounded-full me-2">
+                            <img src="/images/pr.jpg" alt="老彼得" title="老彼得" class="w-16 h-16 rounded-full me-2">
+                            <img src="/images/rt.png" alt="Raphael the Tortoise" title="Raphael the Tortoise" class="w-16 h-16 rounded-full me-2">
+
+                        </div>
                     </div>
                 </div>
             </div>

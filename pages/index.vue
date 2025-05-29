@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100 min-h-screen py-8">
+  <div class="bg-gray-600 min-h-screen py-8">
     <div class="container mx-auto px-4">
       <section class="mb-8">
         <h2 class="text-3xl font-bold mb-4 dark:text-white">网站统计</h2>
