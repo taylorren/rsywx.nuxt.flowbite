@@ -4,7 +4,9 @@
       <h1 class="text-3xl font-bold mb-4">Dashboard</h1>
 
       <!-- 藏书 Group -->
-      <h2 class="text-2xl font-semibold mb-2">藏书</h2>
+      <h2 class="text-2xl font-semibold mb-2">藏书信息</h2>
+      <h3>（截止{{ cur_year}}年{{ month }}月{{ date }}日）</h3>
+      <br/>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <!-- Book Summary Card -->
         <BookSummaryCard :summary="summary" />
@@ -85,4 +87,10 @@ useHead({
     },
   ],
 });
+
+const currentDate = new Date();
+const cur_year = currentDate.getFullYear();
+const month = currentDate.getMonth() + 1;
+const date = currentDate.getDate();
+
 </script>
