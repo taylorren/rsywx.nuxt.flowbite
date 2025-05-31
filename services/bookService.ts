@@ -1,11 +1,42 @@
 // filepath: services/bookService.ts
 import type { Book, BooksSummary } from '~/types/book';
 
+const defaultBook: Book = {
+    id: -1,
+    place: -1,
+    publisher: -1,
+    bookid: "",
+    title: "",
+    author: "",
+    region: "",
+    copyrighter: "",
+    translated: 0,
+    purchdate: "",
+    price: 0,
+    pubdate: "",
+    printdate: "",
+    ver: "",
+    deco: "",
+    kword: 0,
+    page: 0,
+    isbn: "",
+    category: "",
+    ol: "",
+    intro: "",
+    instock: 0,
+    location: "",
+    pu_name: "",
+    pu_place: "",
+    vc: 0,
+    lvt: "",
+    reviews: []
+};
+
 export class BookService {
     private readonly apiBase = 'https://api.rsywx.com';
 
     async getBooksSummary(): Promise<BooksSummary> {
-        const apiUrl=this.apiBase+"/book/summary";
+        const apiUrl = this.apiBase + "/book/summary";
         try {
             const { data, error } = await useFetch<BooksSummary>(apiUrl);
 
@@ -19,4 +50,21 @@ export class BookService {
             throw error;
         }
     }
+
+    async getLatestBook(): Promise<Book> {
+        const apiUrl = this.apiBase + "/book/latest";
+        try {
+            const { data, error } = await useFetch<Book>(apiUrl);
+
+            if (error.value) {
+                throw error.value;
+            }
+
+            return data.value || defaultBook;
+        } catch (error: any) {
+            console.error('Failed to fetch book summary:', error);
+            throw error;
+        }
+    }
+
 }
