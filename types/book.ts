@@ -71,3 +71,11 @@ export interface RandomBook {
   lvt: string;
   img: string;
 };
+
+export interface RecentBook {
+  title: string;
+  bookid: string;
+  vc: number;
+  lvt: string;
+  city: string;
+};

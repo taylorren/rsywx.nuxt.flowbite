@@ -34,7 +34,7 @@
 import { BookService } from '~/services/bookService';
 import { ReadingService } from '~/services/readingService';
 
-import type { BooksSummary, RandomBook } from '~/types/book';
+import type { BooksSummary, RandomBook, RecentBook } from '~/types/book';
 import type { LatestReading, ReadingSummary } from '~/types/reading';
 
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
@@ -42,6 +42,7 @@ import ReadingSummaryCard from '~/components/home/ReadingSummaryCard.vue';
 import LatestBookCard from '~/components/home/LatestBookCard.vue';
 import LatestReadingCard from '~/components/home/LatestReadingCard.vue';
 import BookRandomCard from '~/components/home/BookRandomCard.vue';
+import RecentVisitBookCard from '~/components/home/RecentVisitBookCard.vue';
 
 const bookService = new BookService();
 const readingService = new ReadingService();
@@ -99,6 +100,17 @@ const { data: latestReading, error: latestReadingError } = await useAsyncData<La
 
 if (latestReadingError.value) {
   console.error('Failed to fetch latest reading:', latestReadingError.value);
+}
+
+const { data: recentVisitBook, error: recentVisitBookError } = await useAsyncData<RecentBook[]>(
+  'recent-book', 
+  async () => {
+    return await bookService.getRecentBooks();
+  }
+);
+
+if (recentVisitBookError.value) {
+  console.error('Failed to fetch latest reading:', recentVisitBookError.value);
 }
 
 // Setup meta data

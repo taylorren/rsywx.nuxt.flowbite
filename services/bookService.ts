@@ -1,5 +1,5 @@
 // filepath: services/bookService.ts
-import type { Book, BooksSummary, RandomBook } from '~/types/book';
+import type { Book, BooksSummary, RandomBook, RecentBook } from '~/types/book';
 
 const defaultBook: Book = {
     id: -1,
@@ -108,6 +108,23 @@ export class BookService {
             return data.value || defaultRandomBook;
         } catch (error: any) {
             console.error('Failed to fetch random book:', error);
+            throw error;
+        }
+    }
+
+    async getRecentBooks(): Promise<RecentBook[]> {
+        const apiUrl = this.apiBase + "/book/recent";
+
+        try {
+            const { data, error } = await useFetch<RecentBook[]>(apiUrl);
+
+            if (error.value) {
+                throw error.value;
+            }
+
+            return data.value || []; // Return an empty array as default
+        } catch (error: any) {
+            console.error('Failed to fetch recent books:', error);
             throw error;
         }
     }
