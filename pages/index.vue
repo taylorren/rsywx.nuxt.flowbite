@@ -12,6 +12,8 @@
         <BookSummaryCard :summary="summary" />
         <!-- Latest Book Card -->
         <LatestBookCard :latestBook="latestBook" />
+        <!-- Random Book Card -->
+        <BookRandomCard :randomBook="randomBook?.[0]" @refresh="refreshRandomBook"/>
         <!-- Add more 藏书 cards here -->
       </div>
 
@@ -32,13 +34,14 @@
 import { BookService } from '~/services/bookService';
 import { ReadingService } from '~/services/readingService';
 
-import type { BooksSummary } from '~/types/book';
+import type { BooksSummary, RandomBook } from '~/types/book';
 import type { LatestReading, ReadingSummary } from '~/types/reading';
 
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
 import ReadingSummaryCard from '~/components/home/ReadingSummaryCard.vue';
 import LatestBookCard from '~/components/home/LatestBookCard.vue';
 import LatestReadingCard from '~/components/home/LatestReadingCard.vue';
+import BookRandomCard from '~/components/home/BookRandomCard.vue';
 
 const bookService = new BookService();
 const readingService = new ReadingService();
@@ -63,6 +66,17 @@ const { data: latestBook, error: latestBookError } = await useAsyncData(
 
 if (latestBookError.value) {
   console.error('Failed to fetch latest book:', latestBookError.value);
+}
+
+const { data: randomBook, error: randomBookError, refresh: refreshRandomBook } = await useAsyncData<RandomBook[]>(
+  'randomBook',
+  async () => {
+    return await bookService.getRandomBook();
+  }, 
+);
+
+if (randomBookError.value) {
+  console.error('Failed to fetch random book:', randomBookError.value);
 }
 
 const { data: readingData, error: readingError } = await useAsyncData<ReadingSummary>(

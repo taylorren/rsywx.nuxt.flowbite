@@ -15,10 +15,9 @@
       <br />
       <p class="mb-4">
         最近的书评是
-        <a :href="latestReading?.uri" class="font-semibold text-blue-600 hover:text-blue-800">
+        <a :href="latestReading?.uri" target="_blank" class="font-semibold text-blue-600 hover:text-blue-800">
           《{{ latestReading?.title }}》
-        </a>
-        ，书评标题是{{ latestReading?.reviewtitle }}，发表于{{ latestReading?.create_at }}。
+        </a>，评论的书籍是<a :href="`/books/${latestReading?.book_bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800">《{{ latestReading?.book_title}}》</a>，发表于{{ latestReading?.create_at }}。
       </p>
     </div>
     <a :href="latestReading?.uri"

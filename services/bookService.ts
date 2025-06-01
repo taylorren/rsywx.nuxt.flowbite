@@ -1,5 +1,5 @@
 // filepath: services/bookService.ts
-import type { Book, BooksSummary } from '~/types/book';
+import type { Book, BooksSummary, RandomBook } from '~/types/book';
 
 const defaultBook: Book = {
     id: -1,
@@ -31,6 +31,35 @@ const defaultBook: Book = {
     lvt: "",
     reviews: []
 };
+
+const defaultRandomBook: RandomBook[] = [{
+    id: -1,
+    place: -1,
+    publisher: -1,
+    bookid: "",
+    title: "",
+    author: "",
+    region: "",
+    copyrighter: "",
+    translated: 0,
+    purchdate: "",
+    price: 0,
+    pubdate: "",
+    printdate: "",
+    ver: "",
+    deco: "",
+    kword: 0,
+    page: 0,
+    isbn: "",
+    category: "",
+    ol: "",
+    intro: "",
+    instock: 0,
+    location: "",
+    vc: 0,
+    lvt: "",
+    img: ""
+}];
 
 export class BookService {
     private readonly apiBase = 'https://api.rsywx.com';
@@ -67,4 +96,19 @@ export class BookService {
         }
     }
 
+    async getRandomBook(): Promise<RandomBook[]> {
+        const apiUrl = this.apiBase + "/book/random";
+        
+        try {
+            const { data, error } = await useFetch<RandomBook[]>(apiUrl);
+            if (error.value) {
+                throw error.value;
+            }
+            
+            return data.value || defaultRandomBook;
+        } catch (error: any) {
+            console.error('Failed to fetch random book:', error);
+            throw error;
+        }
+    }
 }
