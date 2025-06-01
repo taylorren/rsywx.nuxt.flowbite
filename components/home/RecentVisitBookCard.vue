@@ -7,7 +7,7 @@
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
           </svg>
-          &nbsp;&nbsp;最近阅读
+          &nbsp;&nbsp;最近访问
         </h2>
         <a :href="`/books/${book?.bookid}.html`">
           <img class="rounded-t-lg" :src="`https://api.rsywx.com/covers/${book?.bookid}.jpg`"
@@ -19,7 +19,7 @@
           <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800">
             《{{ book?.title }}》
           </a>
-          ，上次阅读时间是{{ book?.lvt }}，地点在{{book?.city}}。
+          ，上次访问时间是{{ book?.lvt }}，访客来自{{book?.city}}。
         </p>
       </div>
       <a :href="`/books/${book?.bookid}.html`"

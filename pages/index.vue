@@ -14,6 +14,8 @@
         <LatestBookCard :latestBook="latestBook" />
         <!-- Random Book Card -->
         <BookRandomCard :randomBook="randomBook?.[0]" @refresh="refreshRandomBook"/>
+        <!-- Recent Visit Book Card -->
+        <RecentVisitBookCard :book="recentVisitBook?.[0]"/>
         <!-- Add more 藏书 cards here -->
       </div>
 
@@ -108,7 +110,7 @@ const { data: recentVisitBook, error: recentVisitBookError } = await useAsyncDat
     return await bookService.getRecentBooks();
   }
 );
-
+console.log(recentVisitBook);
 if (recentVisitBookError.value) {
   console.error('Failed to fetch latest reading:', recentVisitBookError.value);
 }

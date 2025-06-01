@@ -113,7 +113,7 @@ export class BookService {
     }
 
     async getRecentBooks(): Promise<RecentBook[]> {
-        const apiUrl = this.apiBase + "/book/recent";
+        const apiUrl = this.apiBase + "/admin/recentbooks";
 
         try {
             const { data, error } = await useFetch<RecentBook[]>(apiUrl);
