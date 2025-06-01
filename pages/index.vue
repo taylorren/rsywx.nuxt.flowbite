@@ -5,8 +5,8 @@
 
       <!-- 藏书 Group -->
       <h2 class="text-2xl font-semibold mb-2">藏书信息</h2>
-      <h3>（截止{{ cur_year}}年{{ month }}月{{ date }}日）</h3>
-      <br/>
+      <h3>（截止{{ cur_year }}年{{ month }}月{{ date }}日）</h3>
+      <br />
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <!-- Book Summary Card -->
         <BookSummaryCard :summary="summary" />
@@ -20,6 +20,8 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Reading Data Card -->
         <ReadingSummaryCard :readingData="readingData" />
+        <!-- Latest Reading Card -->
+        <LatestReadingCard :latestReading="latestReading" />
         <!-- Add more 读书 cards here -->
       </div>
     </div>
@@ -31,11 +33,12 @@ import { BookService } from '~/services/bookService';
 import { ReadingService } from '~/services/readingService';
 
 import type { BooksSummary } from '~/types/book';
-import type { ReadingSummary } from '~/types/reading';
+import type { LatestReading, ReadingSummary } from '~/types/reading';
 
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
 import ReadingSummaryCard from '~/components/home/ReadingSummaryCard.vue';
 import LatestBookCard from '~/components/home/LatestBookCard.vue';
+import LatestReadingCard from '~/components/home/LatestReadingCard.vue';
 
 const bookService = new BookService();
 const readingService = new ReadingService();
@@ -52,14 +55,14 @@ if (summaryError.value) {
 }
 
 const { data: latestBook, error: latestBookError } = await useAsyncData(
-    'latestBook',
-    async () => {
-        return await bookService.getLatestBook();
-    }
+  'latestBook',
+  async () => {
+    return await bookService.getLatestBook();
+  }
 );
 
 if (latestBookError.value) {
-    console.error('Failed to fetch latest book:', latestBookError.value);
+  console.error('Failed to fetch latest book:', latestBookError.value);
 }
 
 const { data: readingData, error: readingError } = await useAsyncData<ReadingSummary>(
@@ -73,13 +76,25 @@ if (readingError.value) {
   console.error('Failed to fetch reading data:', readingError.value);
 }
 
+const { data: latestReading, error: latestReadingError } = await useAsyncData<LatestReading>(
+  'latest-reading',
+  async () => {
+    return await readingService.getLatestReading();
+  }
+);
+
+if (latestReadingError.value) {
+  console.error('Failed to fetch latest reading:', latestReadingError.value);
+}
+
 // Setup meta data
 useHead({
   title: '任氏有无轩 | 藏书、读书、博客、维客', // 设置页面标题
   meta: [
     {
       name: 'description',
-      content: '任氏有无轩，创立于1989年。其对应站点专注于藏书、读书、博客、维客等构造。是中国大陆不多的质量较高的个人站点。', // 设置页面描述
+      content:
+        '任氏有无轩，创立于1989年。其对应站点专注于藏书、读书、博客、维客等构造。是中国大陆不多的质量较高的个人站点。', // 设置页面描述
     },
     {
       name: 'keywords',
@@ -92,5 +107,4 @@ const currentDate = new Date();
 const cur_year = currentDate.getFullYear();
 const month = currentDate.getMonth() + 1;
 const date = currentDate.getDate();
-
 </script>
