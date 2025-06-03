@@ -15,7 +15,7 @@
         </a>
         <br />
         <p class="mb-4">
-          您最近在阅读
+          最近访问的书籍是
           <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800">
             《{{ book?.title }}》
           </a>

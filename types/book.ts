@@ -79,3 +79,17 @@ export interface RecentBook {
   lvt: string;
   city: string;
 };
+
+export interface ForgetBook {
+  title: string;
+  bookid: string;
+  vc: number;
+  lvt: string;
+};
+
+export const defaultForgetBook: ForgetBook = {
+  title: "",
+  bookid: "",
+  vc: 0,
+  lvt: ""
+};

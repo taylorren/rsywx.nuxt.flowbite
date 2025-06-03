@@ -1,5 +1,5 @@
 // filepath: services/bookService.ts
-import type { Book, BooksSummary, RandomBook, RecentBook } from '~/types/book';
+import type { Book, BooksSummary, RandomBook, RecentBook, ForgetBook } from '~/types/book';
 
 const defaultBook: Book = {
     id: -1,
@@ -125,6 +125,23 @@ export class BookService {
             return data.value || []; // Return an empty array as default
         } catch (error: any) {
             console.error('Failed to fetch recent books:', error);
+            throw error;
+        }
+    }
+
+    async getForgetBooks(): Promise<ForgetBook[]> {
+        const apiUrl = this.apiBase + "/admin/forgetbooks";
+
+        try {
+            const { data, error } = await useFetch<ForgetBook[]>(apiUrl);
+
+            if (error.value) {
+                throw error.value;
+            }
+
+            return data.value || []; // 返回空数组作为默认值
+        } catch (error: any) {
+            console.error('Failed to fetch forget books:', error);
             throw error;
         }
     }
