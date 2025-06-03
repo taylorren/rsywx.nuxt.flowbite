@@ -93,3 +93,32 @@ export const defaultForgetBook: ForgetBook = {
   vc: 0,
   lvt: ""
 };
+
+// 根据/books/today接口返回的数据创建的类型
+export interface TodayBook {
+  id: number;
+  place: number;
+  publisher: number;
+  bookid: string;
+  title: string;
+  author: string;
+  region: string;
+  copyrighter: string;
+  translated: number;
+  purchdate: string;
+  price: number;
+  pubdate: string;
+  printdate: string;
+  ver: string;
+  deco: string;
+  kword: number;
+  page: number;
+  isbn: string;
+  category: string;
+  ol: string;
+  intro: string;
+  instock: number;
+  location: string;
+}
+
+

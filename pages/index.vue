@@ -9,24 +9,28 @@
       <br />
       <div class="flex flex-wrap gap-4 mb-8">
         <!-- Book Summary Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <BookSummaryCard :summary="summary" />
         </div>
         <!-- Latest Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <LatestBookCard :latestBook="latestBook" />
         </div>
         <!-- Random Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <BookRandomCard :randomBook="randomBook?.[0]" @refresh="refreshRandomBook"/>
         </div>
         <!-- Recent Visit Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <RecentVisitBookCard :book="recentVisitBook?.[0]"/>
         </div>
         <!-- Forget Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <ForgetBookCard :book="forgetBook?.[0]"/>
+        </div>
+        <!-- Today Books Card -->
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <BookTodayCard :todayBooks="todayBooks || []"/>
         </div>
         <!-- Add more 藏书 cards here -->
       </div>
@@ -48,7 +52,7 @@
 import { BookService } from '~/services/bookService';
 import { ReadingService } from '~/services/readingService';
 
-import type { BooksSummary, RandomBook, RecentBook, ForgetBook } from '~/types/book';
+import type { BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook } from '~/types/book';
 import type { LatestReading, ReadingSummary } from '~/types/reading';
 
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
@@ -58,6 +62,7 @@ import LatestReadingCard from '~/components/home/LatestReadingCard.vue';
 import BookRandomCard from '~/components/home/BookRandomCard.vue';
 import RecentVisitBookCard from '~/components/home/RecentVisitBookCard.vue';
 import ForgetBookCard from '~/components/home/ForgetBookCard.vue';
+import BookTodayCard from '~/components/home/BookTodayCard.vue';
 
 const bookService = new BookService();
 const readingService = new ReadingService();
@@ -137,6 +142,17 @@ const { data: forgetBook, error: forgetBookError } = await useAsyncData<ForgetBo
 
 if (forgetBookError.value) {
   console.error('Failed to fetch forget book:', forgetBookError.value);
+}
+
+const { data: todayBooks, error: todayBooksError } = await useAsyncData<TodayBook[]>(
+  'today-books', 
+  async () => {
+    return await bookService.getTodayBooks();
+  }
+);
+
+if (todayBooksError.value) {
+  console.error('Failed to fetch today books:', todayBooksError.value);
 }
 
 // Setup meta data
