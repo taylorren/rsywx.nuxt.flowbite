@@ -1,6 +1,6 @@
 <template>
-  <nav class="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+  <nav class="fixed top-0 w-full z-50 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 shadow-md">
+    <div class="container flex flex-wrap items-center justify-between mx-auto p-4">
       <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
         <img src="/images/logo.svg" class="h-16" alt="任氏有无轩Logo" />
         <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">任氏有无轩</span>
@@ -50,7 +50,22 @@
           </li>
         </ul>
       </div>
-      <a href="#" class="bg-green-500 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center rtl:space-x-reverse">联系站长</a>
+      <div class="flex items-center space-x-3">
+        <a href="#" class="bg-green-500 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center rtl:space-x-reverse">联系站长</a>
+      </div>
     </div>
   </nav>
+  <!-- 添加一个占位符div，防止内容被固定导航栏遮挡 -->
+  <div class="h-24"></div>
 </template>
+
+<script setup>
+import { onMounted } from 'vue';
+import { useFlowbite } from '~/composables/useFlowbite';
+
+// 在组件挂载时初始化Flowbite
+onMounted(() => {
+  // 初始化Flowbite
+  useFlowbite();
+});
+</script>

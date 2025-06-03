@@ -1,17 +1,28 @@
 <template>
     <footer class="bg-white dark:bg-gray-900">
-        <div class="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
+        <div class="container mx-auto w-full p-4 py-6 lg:py-8">
             <div class="md:flex md:justify-between">
-                <div class="mb-6 md:mb-0">
+                <div class="mb-6 md:mb-0 md:w-1/3">
                     <a href="/" class="flex items-center">
                         <img src="/images/logo.svg" class="h-12 me-3" alt="任氏有无轩Logo" />
                         <span
                             class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">任氏有无轩</span>
                     </a>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">任氏有无轩，成立于1989年。两任主人对各阶段设立过程进行了记录。详见<a href="https://rsywx.com/rsywxmmj">《任氏有无轩铭名记》</a>，<a href="https://rsywx.com/rsywxmmj2">《二记》</a>，<a href="https://rsywx.com/rsywxmmj3">《三记》</a>，<a href="https://rsywx.com/rsywxmmj4">《四记》</a>诸篇。</p>
+                    <!-- 显示模式切换按钮 -->
+                    <button @click="toggleDarkMode" class="mt-3 inline-flex items-center text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                        <span class="sr-only">切换显示模式</span>
+                        <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
                 </div>
                 <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
                     <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">框架</h2>
+                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">开发框架</h2>
                         <ul class="text-gray-500 dark:text-gray-400 font-medium">
                             <li class="mb-1">
                                 <a href="https://nuxt.com/" class="hover:underline">Nuxt</a>
@@ -88,5 +99,44 @@
 </template>
 
 <script setup>
-    const currentYear=new Date().getFullYear();
+    import { ref, onMounted } from 'vue';
+    
+    const currentYear = new Date().getFullYear();
+    
+    // 暗黑模式切换功能
+    const isDarkMode = ref(false);
+    
+    // 在组件挂载时检查本地存储和系统偏好
+    onMounted(() => {
+        // 检查本地存储中的主题设置
+        const savedTheme = localStorage.getItem('theme');
+        
+        if (savedTheme) {
+            // 如果有保存的主题设置，使用它
+            isDarkMode.value = savedTheme === 'dark';
+        } else {
+            // 否则检查系统偏好
+            isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        
+        // 应用当前主题
+        applyTheme();
+    });
+    
+    // 切换暗黑模式
+    function toggleDarkMode() {
+        isDarkMode.value = !isDarkMode.value;
+        applyTheme();
+    }
+    
+    // 应用主题到HTML元素
+    function applyTheme() {
+        if (isDarkMode.value) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }
 </script>

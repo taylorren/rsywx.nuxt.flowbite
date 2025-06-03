@@ -1,7 +1,7 @@
 <template>
-    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between h-full">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between h-full">
         <div>
-            <h2 class="text-xl font-semibold mb-2 flex items-center">
+            <h2 class="text-xl font-semibold mb-2 flex items-center dark:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-6 h-6 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -11,7 +11,7 @@
             </h2>
             <img class="rounded-t-lg" src="/images/reading_summary.png" alt="任氏有无轩" />
             <br />
-            <p>任氏有无轩主人共读书{{ readingData?.hc }}本，写了{{ readingData?.rc }}篇读书笔记。</p><br />
+            <p class="dark:text-gray-300">任氏有无轩主人共读书{{ readingData?.hc }}本，写了{{ readingData?.rc }}篇读书笔记。</p><br />
         </div>
         <a href="#"
             class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 self-start">

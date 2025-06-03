@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between h-full">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between h-full">
     <div>
-      <h2 class="text-xl font-semibold mb-2 flex items-center">
+      <h2 class="text-xl font-semibold mb-2 flex items-center dark:text-white">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
           class="size-6">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -14,9 +14,9 @@
           :alt="`${book?.title}`" />
       </a>
       <br />
-      <p class="mb-4">
+      <p class="mb-4 dark:text-gray-300">
         久未访问的书籍是
-        <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800">
+        <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
           《{{ book?.title }}》
         </a>
         ，上次访问时间是{{ book?.lvt }}，已有{{ book?.vc }}次访问。
