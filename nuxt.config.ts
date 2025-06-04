@@ -11,5 +11,9 @@ export default defineNuxtConfig({
     ],
   },
 
+  plugins: [
+    '~/plugins/chart.js'
+  ],
+
   compatibilityDate: "2025-02-28",
 });

@@ -11,7 +11,7 @@
             </h2>
             <img class="rounded-t-lg" src="/images/reading_summary.png" alt="任氏有无轩" />
             <br />
-            <p class="dark:text-gray-300">任氏有无轩主人共读书{{ readingData?.hc }}本，写了{{ readingData?.rc }}篇读书笔记。</p><br />
+            <p class="dark:text-gray-300">任氏有无轩主人共读书{{ formatNumber(readingData?.hc) }}本，写了{{ formatNumber(readingData?.rc) }}篇读书笔记。</p><br />
         </div>
         <a href="#"
             class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 self-start">
@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import type { ReadingSummary } from '~/types/reading';
+import { formatNumber } from '~/utils/helper';
 
 defineProps<{
     readingData: ReadingSummary | null | undefined;

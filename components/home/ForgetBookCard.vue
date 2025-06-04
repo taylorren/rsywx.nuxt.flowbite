@@ -19,7 +19,7 @@
         <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
           《{{ book?.title }}》
         </a>
-        ，上次访问时间是{{ book?.lvt }}，已有{{ book?.vc }}次访问。
+        ，上次访问时间是{{ book?.lvt }}，已有{{ formatNumber(book?.vc) }}次访问。
       </p>
     </div>
     <a :href="`/books/${book?.bookid}.html`"
@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import type { ForgetBook } from '~/types/book';
+import { formatNumber } from '~/utils/helper';
 
 defineProps<{
   book: ForgetBook | null | undefined;

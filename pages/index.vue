@@ -32,18 +32,25 @@
         <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <BookTodayCard :todayBooks="todayBooks || []"/>
         </div>
+        <!-- Visit Stats Card -->
+        <div class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]">
+          <VisitStatsCard :visitStats="visitStats" />
+        </div>
         <!-- Add more 藏书 cards here -->
       </div>
 
       <!-- 读书 Group -->
       <h2 class="text-2xl font-semibold mb-2 dark:text-white">读书</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <!-- Reading Data Card -->
         <ReadingSummaryCard :readingData="readingData" />
         <!-- Latest Reading Card -->
         <LatestReadingCard :latestReading="latestReading" />
         <!-- Add more 读书 cards here -->
       </div>
+
+      <!-- 访问统计 Group -->
+      <!-- 已移除访问统计部分，将卡片移到藏书信息部分 -->
     </div>
   </div>
 </template>
@@ -51,9 +58,11 @@
 <script setup lang="ts">
 import { BookService } from '~/services/bookService';
 import { ReadingService } from '~/services/readingService';
+import { visitService } from '~/services/visitService';
 
 import type { BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook } from '~/types/book';
 import type { LatestReading, ReadingSummary } from '~/types/reading';
+import type { VisitStatsArray } from '~/types/visit';
 
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
 import ReadingSummaryCard from '~/components/home/ReadingSummaryCard.vue';
@@ -63,6 +72,7 @@ import BookRandomCard from '~/components/home/BookRandomCard.vue';
 import RecentVisitBookCard from '~/components/home/RecentVisitBookCard.vue';
 import ForgetBookCard from '~/components/home/ForgetBookCard.vue';
 import BookTodayCard from '~/components/home/BookTodayCard.vue';
+import VisitStatsCard from '~/components/home/VisitStatsCard.vue';
 
 const bookService = new BookService();
 const readingService = new ReadingService();
@@ -153,6 +163,18 @@ const { data: todayBooks, error: todayBooksError } = await useAsyncData<TodayBoo
 
 if (todayBooksError.value) {
   console.error('Failed to fetch today books:', todayBooksError.value);
+}
+
+// 获取访问统计数据
+const { data: visitStats, error: visitStatsError } = await useAsyncData<VisitStatsArray>(
+  'visit-stats',
+  async () => {
+    return await visitService.getVisitStats();
+  }
+);
+
+if (visitStatsError.value) {
+  console.error('Failed to fetch visit stats:', visitStatsError.value);
 }
 
 // Setup meta data

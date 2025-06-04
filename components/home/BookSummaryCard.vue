@@ -12,7 +12,20 @@
         <img class="rounded-t-lg" src="/images/bookshelf.png"
           alt="任氏有无轩" />
           <br/>
-      <p class="dark:text-gray-300">据不完全统计，任氏有无轩收藏书籍{{ summary?.bc }}本，约{{ summary?.pc }}页，{{ summary?.wc }}千字。</p>
+      <p class="dark:text-gray-300">据不完全统计，任氏有无轩收藏书籍
+        <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+          {{ formatNumber(summary?.bc) }}
+        </span>
+        本，约
+        <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+          {{ formatNumber(summary?.pc) }}
+        </span>
+        页，
+        <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+          {{ formatNumber(summary?.wc) }}
+        </span>
+        千字。
+      </p>
     </div>
     <a href="/books/list"
       class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 self-start">
@@ -28,6 +41,7 @@
 
 <script setup lang="ts">
 import type { BooksSummary } from '~/types/book';
+import { formatNumber } from '~/utils/helper';
 
 defineProps<{
   summary: BooksSummary | null | undefined;
