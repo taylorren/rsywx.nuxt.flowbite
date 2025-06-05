@@ -121,4 +121,7 @@ export interface TodayBook {
   location: string;
 }
 
+// 根据/book/tags/{bookid}接口返回的数据创建的类型
+export type BookTags = string[];
+
 

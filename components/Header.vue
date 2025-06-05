@@ -1,5 +1,5 @@
 <template>
-  <nav class="fixed top-0 w-full z-50 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 shadow-md">
+  <nav class="fixed top-0 w-full z-50 bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 shadow-md">
     <div class="container flex flex-wrap items-center justify-between mx-auto p-4">
       <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
         <img src="/images/logo.svg" class="h-16" alt="任氏有无轩Logo" />

@@ -1,5 +1,5 @@
 // filepath: services/bookService.ts
-import type { Book, BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook } from '~/types/book';
+import type { Book, BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook, BookTags } from '~/types/book';
 
 const defaultBook: Book = {
     id: -1,
@@ -63,17 +63,17 @@ const defaultRandomBook: RandomBook[] = [{
 
 export class BookService {
     private readonly apiBase = 'https://api.rsywx.com';
+    private readonly $fetch: typeof globalThis.$fetch;
+    
+    constructor($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
+        this.$fetch = $fetch;
+    }
 
     async getBooksSummary(): Promise<BooksSummary> {
         const apiUrl = this.apiBase + "/book/summary";
         try {
-            const { data, error } = await useFetch<BooksSummary>(apiUrl);
-
-            if (error.value) {
-                throw error.value;
-            }
-
-            return data.value || { bc: 0, pc: '', wc: '' };
+            const data = await this.$fetch<BooksSummary>(apiUrl);
+            return data || { bc: 0, pc: '', wc: '' };
         } catch (error: any) {
             console.error('Failed to fetch book summary:', error);
             throw error;
@@ -83,46 +83,35 @@ export class BookService {
     async getLatestBook(): Promise<Book> {
         const apiUrl = this.apiBase + "/book/latest";
         try {
-            const { data, error } = await useFetch<Book>(apiUrl);
-
-            if (error.value) {
-                throw error.value;
-            }
-
-            return data.value || defaultBook;
+            const data = await this.$fetch<Book>(apiUrl);
+            return data || defaultBook;
         } catch (error: any) {
-            console.error('Failed to fetch book summary:', error);
+            console.error('Failed to fetch latest book:', error);
             throw error;
         }
     }
 
-    async getRandomBook(): Promise<RandomBook[]> {
-        const apiUrl = this.apiBase + "/book/random";
-        
+    async getRandomBooks(count: number = 5): Promise<RandomBook[]> {
+        const apiUrl = this.apiBase + "/book/random/" + count;
         try {
-            const { data, error } = await useFetch<RandomBook[]>(apiUrl);
-            if (error.value) {
-                throw error.value;
-            }
-            
-            return data.value || defaultRandomBook;
+            const data = await this.$fetch<RandomBook[]>(apiUrl);
+            return data || [];
         } catch (error: any) {
-            console.error('Failed to fetch random book:', error);
+            console.error('Failed to fetch random books:', error);
             throw error;
         }
+    }
+    
+    async getRandomBook(): Promise<RandomBook[]> {
+        return this.getRandomBooks(1);
     }
 
     async getRecentBooks(): Promise<RecentBook[]> {
         const apiUrl = this.apiBase + "/admin/recentbooks";
 
         try {
-            const { data, error } = await useFetch<RecentBook[]>(apiUrl);
-
-            if (error.value) {
-                throw error.value;
-            }
-
-            return data.value || []; // Return an empty array as default
+            const data = await this.$fetch<RecentBook[]>(apiUrl);
+            return data || []; // Return an empty array as default
         } catch (error: any) {
             console.error('Failed to fetch recent books:', error);
             throw error;
@@ -133,13 +122,8 @@ export class BookService {
         const apiUrl = this.apiBase + "/admin/forgetbooks";
 
         try {
-            const { data, error } = await useFetch<ForgetBook[]>(apiUrl);
-
-            if (error.value) {
-                throw error.value;
-            }
-
-            return data.value || []; // 返回空数组作为默认值
+            const data = await this.$fetch<ForgetBook[]>(apiUrl);
+            return data || []; // 返回空数组作为默认值
         } catch (error: any) {
             console.error('Failed to fetch forget books:', error);
             throw error;
@@ -150,15 +134,43 @@ export class BookService {
         const apiUrl = this.apiBase + "/books/today";
     
         try {
-            const { data, error } = await useFetch<TodayBook[]>(apiUrl);
-    
-            if (error.value) {
-                throw error.value;
-            }
-    
-            return data.value || []; // 返回空数组作为默认值
+            const data = await this.$fetch<TodayBook[]>(apiUrl);
+            return data || []; // 返回空数组作为默认值
         } catch (error: any) {
             console.error('Failed to fetch today books:', error);
+            throw error;
+        }
+    }
+
+    async getTagsByBookid(bookid: string): Promise<BookTags> {
+        const apiUrl = this.apiBase + "/book/tags/" + bookid;
+
+        try {
+            const data = await this.$fetch<BookTags>(apiUrl);
+            return data || []; // 返回空数组作为默认值
+        } catch (error: any) {
+            console.error(`Failed to fetch tags for book ${bookid}:`, error);
+            throw error;
+        }
+    }
+
+    async getBookByBookid(bookid: string): Promise<{ book: Book; tags: BookTags }> {
+        // 获取书籍详情
+        const apiUrl = this.apiBase + "/book/detail/" + bookid;
+        
+        try {
+            // 获取书籍信息
+            const bookData = await this.$fetch<Book>(apiUrl);
+            const book = bookData || defaultBook;
+            
+            // 获取标签信息
+            const tags = await this.getTagsByBookid(bookid);
+            
+            // 注意：访问更新已在远程 API 调用中处理，无需单独调用
+            
+            return { book, tags };
+        } catch (error: any) {
+            console.error(`Failed to fetch book ${bookid}:`, error);
             throw error;
         }
     }

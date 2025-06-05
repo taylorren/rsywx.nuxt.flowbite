@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100 dark:bg-gray-900 min-h-screen py-8">
+  <div class="min-h-screen py-8">
     <div class="container mx-auto px-4">
       <h1 class="text-3xl font-bold mb-4 dark:text-white">任氏有无轩基本情况一览</h1>
 
@@ -79,7 +79,7 @@ import ForgetBookCard from '~/components/home/ForgetBookCard.vue';
 import BookTodayCard from '~/components/home/BookTodayCard.vue';
 import VisitStatsCard from '~/components/home/VisitStatsCard.vue';
 
-const bookService = new BookService();
+const bookService = new BookService($fetch);
 const readingService = new ReadingService();
 
 // 关键数据（立即加载）
