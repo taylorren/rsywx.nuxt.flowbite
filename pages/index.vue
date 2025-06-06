@@ -53,6 +53,16 @@
         <!-- Add more 读书 cards here -->
       </div>
 
+      <!-- 其他功能 Group -->
+      <h2 class="text-2xl font-semibold mb-2 dark:text-white">其他功能</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <!-- QOTD Card -->
+        <div ref="qotdRef">
+          <QotdCard />
+        </div>
+        <!-- Add more cards here -->
+      </div>
+
       <!-- 访问统计 Group -->
       <!-- 已移除访问统计部分，将卡片移到藏书信息部分 -->
     </div>
@@ -60,15 +70,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
-import { BookService } from '~/services/bookService';
-import { ReadingService } from '~/services/readingService';
-import { visitService } from '~/services/visitService';
+import { ref, onMounted } from 'vue';
 
-import type { BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook } from '~/types/book';
-import type { LatestReading, ReadingSummary } from '~/types/reading';
-import type { VisitStatsArray } from '~/types/visit';
-
+// 导入组件
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
 import ReadingSummaryCard from '~/components/home/ReadingSummaryCard.vue';
 import LatestBookCard from '~/components/home/LatestBookCard.vue';
@@ -78,187 +82,79 @@ import RecentVisitBookCard from '~/components/home/RecentVisitBookCard.vue';
 import ForgetBookCard from '~/components/home/ForgetBookCard.vue';
 import BookTodayCard from '~/components/home/BookTodayCard.vue';
 import VisitStatsCard from '~/components/home/VisitStatsCard.vue';
+import QotdCard from '~/components/home/QotdCard.vue';
 
-const bookService = new BookService($fetch);
-const readingService = new ReadingService();
+// 导入组合式API
+import { useBooks } from '~/composables/useBooks';
+import { useReading } from '~/composables/useReading';
+import { useVisits } from '~/composables/useVisits';
+import { useIntersectionObserver } from '~/composables/useIntersectionObserver';
 
-// 关键数据（立即加载）
-const { data: summary, error: summaryError } = await useAsyncData<BooksSummary>('summary', () => bookService.getBooksSummary());
-const { data: latestBook, error: latestBookError } = await useAsyncData('latestBook', () => bookService.getLatestBook());
+// 使用组合式API
+const {
+  summary,
+  summaryError,
+  latestBook,
+  latestBookError,
+  randomBook,
+  randomBookError,
+  recentVisitBook,
+  recentVisitBookError,
+  forgetBook,
+  forgetBookError,
+  todayBooks,
+  todayBooksError,
+  loadRandomBook,
+  loadRecentVisitBook,
+  loadForgetBook,
+  loadTodayBooks,
+  refreshRandomBook,
+  initializeKeyData
+} = useBooks();
 
-// 非关键数据（延迟加载）
-const randomBook = ref<RandomBook[] | null>(null);
-const randomBookError = ref<Error | null>(null);
+const {
+  readingData,
+  readingError,
+  latestReading,
+  latestReadingError,
+  loadReadingData,
+  loadLatestReading
+} = useReading();
+
+const {
+  visitStats,
+  visitStatsError,
+  loadVisitStats
+} = useVisits();
+
+// 初始化关键数据
+initializeKeyData();
+
+// 创建元素引用
 const randomBookRef = ref<HTMLElement | null>(null);
-const randomBookLoaded = ref(false);
-
-const recentVisitBook = ref<RecentBook[] | null>(null);
-const recentVisitBookError = ref<Error | null>(null);
 const recentVisitBookRef = ref<HTMLElement | null>(null);
-const recentVisitBookLoaded = ref(false);
-
-const forgetBook = ref<ForgetBook[] | null>(null);
-const forgetBookError = ref<Error | null>(null);
 const forgetBookRef = ref<HTMLElement | null>(null);
-const forgetBookLoaded = ref(false);
-
-const todayBooks = ref<TodayBook[] | null>(null);
-const todayBooksError = ref<Error | null>(null);
 const todayBooksRef = ref<HTMLElement | null>(null);
-const todayBooksLoaded = ref(false);
-
-const visitStats = ref<VisitStatsArray | null>(null);
-const visitStatsError = ref<Error | null>(null);
 const visitStatsRef = ref<HTMLElement | null>(null);
-const visitStatsLoaded = ref(false);
-
-const readingData = ref<ReadingSummary | null>(null);
-const readingError = ref<Error | null>(null);
 const readingDataRef = ref<HTMLElement | null>(null);
-const readingDataLoaded = ref(false);
-
-const latestReading = ref<LatestReading | null>(null);
-const latestReadingError = ref<Error | null>(null);
 const latestReadingRef = ref<HTMLElement | null>(null);
-const latestReadingLoaded = ref(false);
+const qotdRef = ref<HTMLElement | null>(null);
 
-// 刷新随机书籍的方法
-const refreshRandomBook = async () => {
-  try {
-    randomBook.value = await bookService.getRandomBook();
-  } catch (error) {
-    randomBookError.value = error as Error;
-    console.error('Failed to fetch random book:', error);
-  }
-};
-
-// 创建Intersection Observer实例
-const createObserver = () => {
-  const options = {
-    root: null, // 使用视口作为根
-    rootMargin: '0px', // 无边距
-    threshold: 0.1 // 当10%的元素可见时触发
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        // 根据目标元素加载相应数据
-        if (entry.target === randomBookRef.value && !randomBookLoaded.value) {
-          loadRandomBook();
-          randomBookLoaded.value = true;
-        } else if (entry.target === recentVisitBookRef.value && !recentVisitBookLoaded.value) {
-          loadRecentVisitBook();
-          recentVisitBookLoaded.value = true;
-        } else if (entry.target === forgetBookRef.value && !forgetBookLoaded.value) {
-          loadForgetBook();
-          forgetBookLoaded.value = true;
-        } else if (entry.target === todayBooksRef.value && !todayBooksLoaded.value) {
-          loadTodayBooks();
-          todayBooksLoaded.value = true;
-        } else if (entry.target === visitStatsRef.value && !visitStatsLoaded.value) {
-          loadVisitStats();
-          visitStatsLoaded.value = true;
-        } else if (entry.target === readingDataRef.value && !readingDataLoaded.value) {
-          loadReadingData();
-          readingDataLoaded.value = true;
-        } else if (entry.target === latestReadingRef.value && !latestReadingLoaded.value) {
-          loadLatestReading();
-          latestReadingLoaded.value = true;
-        }
-        
-        // 一旦加载，取消观察
-        observer.unobserve(entry.target);
-      }
-    });
-  }, options);
-
-  return observer;
-};
-
-// 加载各个非关键数据的方法
-const loadRandomBook = async () => {
-  try {
-    randomBook.value = await bookService.getRandomBook();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    randomBookError.value = error as Error;
-    console.error('Failed to fetch random book:', error);
-  }
-};
-
-const loadRecentVisitBook = async () => {
-  try {
-    recentVisitBook.value = await bookService.getRecentBooks();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    recentVisitBookError.value = error as Error;
-    console.error('Failed to fetch recent visit book:', error);
-  }
-};
-
-const loadForgetBook = async () => {
-  try {
-    forgetBook.value = await bookService.getForgetBooks();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    forgetBookError.value = error as Error;
-    console.error('Failed to fetch forget book:', error);
-  }
-};
-
-const loadTodayBooks = async () => {
-  try {
-    todayBooks.value = await bookService.getTodayBooks();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    todayBooksError.value = error as Error;
-    console.error('Failed to fetch today books:', error);
-  }
-};
-
-const loadVisitStats = async () => {
-  try {
-    visitStats.value = await visitService.getVisitStats();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    visitStatsError.value = error as Error;
-    console.error('Failed to fetch visit stats:', error);
-  }
-};
-
-const loadReadingData = async () => {
-  try {
-    readingData.value = await readingService.getReadingData();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    readingError.value = error as Error;
-    console.error('Failed to fetch reading data:', error);
-  }
-};
-
-const loadLatestReading = async () => {
-  try {
-    latestReading.value = await readingService.getLatestReading();
-    await nextTick(); // 等待DOM更新
-  } catch (error) {
-    latestReadingError.value = error as Error;
-    console.error('Failed to fetch latest reading:', error);
-  }
-};
+// 使用Intersection Observer管理延迟加载
+const { observe } = useIntersectionObserver();
 
 // 在组件挂载后设置观察者
 onMounted(() => {
-  const observer = createObserver();
-  
   // 观察所有需要延迟加载的组件
-  if (randomBookRef.value) observer.observe(randomBookRef.value);
-  if (recentVisitBookRef.value) observer.observe(recentVisitBookRef.value);
-  if (forgetBookRef.value) observer.observe(forgetBookRef.value);
-  if (todayBooksRef.value) observer.observe(todayBooksRef.value);
-  if (visitStatsRef.value) observer.observe(visitStatsRef.value);
-  if (readingDataRef.value) observer.observe(readingDataRef.value);
-  if (latestReadingRef.value) observer.observe(latestReadingRef.value);
+  observe(randomBookRef.value, loadRandomBook);
+  observe(recentVisitBookRef.value, loadRecentVisitBook);
+  observe(forgetBookRef.value, loadForgetBook);
+  observe(todayBooksRef.value, loadTodayBooks);
+  observe(visitStatsRef.value, loadVisitStats);
+  observe(readingDataRef.value, loadReadingData);
+  observe(latestReadingRef.value, loadLatestReading);
+  // QotdCard组件会自行加载数据
+  observe(qotdRef.value, () => {});
 });
 
 // 错误处理
