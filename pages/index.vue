@@ -60,6 +60,10 @@
         <div ref="qotdRef">
           <QotdCard />
         </div>
+        <!-- WOTD Card -->
+        <div ref="wotdRef">
+          <WotdCard />
+        </div>
         <!-- Add more cards here -->
       </div>
 
@@ -83,6 +87,7 @@ import ForgetBookCard from '~/components/home/ForgetBookCard.vue';
 import BookTodayCard from '~/components/home/BookTodayCard.vue';
 import VisitStatsCard from '~/components/home/VisitStatsCard.vue';
 import QotdCard from '~/components/home/QotdCard.vue';
+import WotdCard from '~/components/home/WotdCard.vue';
 
 // 导入组合式API
 import { useBooks } from '~/composables/useBooks';

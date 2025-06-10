@@ -30,7 +30,10 @@
               </a>
               <div class="ml-1 text-sm text-gray-600 dark:text-gray-400">
                 <div>收藏于
-                  <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                  <span 
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer"
+                    :title="formatDate(book.purchdate)"
+                  >
                     {{ calculateYearsAgo(book.purchdate) }}
                   </span>
                   年前，位置是
@@ -60,6 +63,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import type { TodayBook } from '~/types/book';
+import { formatDate } from '~/utils/helper';
 
 const props = defineProps({
   todayBooks: {
@@ -112,6 +116,8 @@ const calculateYearsAgo = (purchdate: string): number => {
   
   return Math.max(0, yearsAgo); // 确保不返回负数
 };
+
+// formatPurchaseDate 函数已移至 utils/helper.ts 中的 formatDate 函数
 
 // 用于计算高度和控制显示的变量
 const bookListContainer = ref<HTMLElement | null>(null);
