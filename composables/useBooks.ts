@@ -59,7 +59,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
     if (randomBookLoaded.value) return;
     
     try {
-      randomBook.value = await bookService.getRandomBook();
+      randomBook.value = await bookService.getRandomBooks();
       randomBookLoaded.value = true;
       await nextTick(); // 等待DOM更新
     } catch (error) {
@@ -71,7 +71,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   // 刷新随机书籍的方法
   const refreshRandomBook = async () => {
     try {
-      randomBook.value = await bookService.getRandomBook();
+      randomBook.value = await bookService.getRandomBooks();
     } catch (error) {
       randomBookError.value = error as Error;
       console.error('Failed to fetch random book:', error);

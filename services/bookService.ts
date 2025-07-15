@@ -1,5 +1,6 @@
 // filepath: services/bookService.ts
 import type { Book, BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook, BookTags } from '~/types/book';
+import { useRuntimeConfig } from '#app';
 
 const defaultBook: Book = {
     id: -1,
@@ -62,15 +63,17 @@ const defaultRandomBook: RandomBook[] = [{
 }];
 
 export class BookService {
-    private readonly apiBase = 'https://api.rsywx.com';
+    private readonly apiBase: string;
     private readonly $fetch: typeof globalThis.$fetch;
     
     constructor($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
+        const config = useRuntimeConfig();
+        this.apiBase = config.public.apiBase || 'http://api.rsywx';
         this.$fetch = $fetch;
     }
 
     async getBooksSummary(): Promise<BooksSummary> {
-        const apiUrl = this.apiBase + "/book/summary";
+        const apiUrl = this.apiBase + "/books/summary";
         try {
             const data = await this.$fetch<BooksSummary>(apiUrl);
             return data || { bc: 0, pc: '', wc: '' };
@@ -81,7 +84,7 @@ export class BookService {
     }
 
     async getLatestBook(): Promise<Book> {
-        const apiUrl = this.apiBase + "/book/latest";
+        const apiUrl = this.apiBase + "/books/latest";
         try {
             const data = await this.$fetch<Book>(apiUrl);
             return data || defaultBook;
@@ -91,10 +94,11 @@ export class BookService {
         }
     }
 
-    async getRandomBooks(count: number = 5): Promise<RandomBook[]> {
-        const apiUrl = this.apiBase + "/book/random/" + count;
+    async getRandomBooks(count: number = 1): Promise<RandomBook[]> {
+        const apiUrl = this.apiBase + "/books/random/" + count;
         try {
             const data = await this.$fetch<RandomBook[]>(apiUrl);
+            console.log("随机书籍：", data);
             return data || [];
         } catch (error: any) {
             console.error('Failed to fetch random books:', error);
@@ -102,12 +106,8 @@ export class BookService {
         }
     }
     
-    async getRandomBook(): Promise<RandomBook[]> {
-        return this.getRandomBooks(1);
-    }
-
     async getRecentBooks(): Promise<RecentBook[]> {
-        const apiUrl = this.apiBase + "/admin/recentbooks";
+        const apiUrl = this.apiBase + "/books/recent_visit";
 
         try {
             const data = await this.$fetch<RecentBook[]>(apiUrl);
@@ -119,7 +119,7 @@ export class BookService {
     }
 
     async getForgetBooks(): Promise<ForgetBook[]> {
-        const apiUrl = this.apiBase + "/admin/forgetbooks";
+        const apiUrl = this.apiBase + "/books/forgotten";
 
         try {
             const data = await this.$fetch<ForgetBook[]>(apiUrl);

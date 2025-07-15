@@ -16,4 +16,10 @@ export default defineNuxtConfig({
   ],
 
   compatibilityDate: "2025-02-28",
+
+  runtimeConfig: {
+    public: {
+      apiBase: 'http://api.rsywx', // 这里可以改成你的实际 API 地址
+    }
+  },
 });
