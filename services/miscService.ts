@@ -1,8 +1,8 @@
 // filepath: services/miscService.ts
 import type { Weather, Word, Qotd } from '~/types/misc';
+import { useRuntimeConfig } from '#app';
 
 export class MiscService {
-  private readonly apiBase = 'https://api.rsywx.com';
   private readonly $fetch: typeof globalThis.$fetch;
   
   constructor($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
@@ -14,11 +14,18 @@ export class MiscService {
    * @returns Weather data object
    */
   async getWeather(): Promise<Weather> {
-    const apiUrl = `${this.apiBase}/weather`;
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api';
+     const apiKey = (config.public.apiKey as string) || 'your-api-key';
+     const apiUrl = `${apiBase}/weather`;
     
     try {
-      const data = await this.$fetch<Weather>(apiUrl);
-      return data;
+      const response = await this.$fetch<{success: boolean, data: Weather}>(apiUrl, {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      });
+      return response.data;
     } catch (error: any) {
       console.error('Failed to fetch weather data:', error);
       throw error;
@@ -30,11 +37,18 @@ export class MiscService {
    * @returns Word of the day object
    */
   async getWordOfTheDay(): Promise<Word> {
-    const apiUrl = `${this.apiBase}/misc/wotd`;
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api';
+     const apiKey = (config.public.apiKey as string) || 'your-api-key';
+     const apiUrl = `${apiBase}/misc/wotd`;
     
     try {
-      const data = await this.$fetch<Word>(apiUrl);
-      return data;
+      const response = await this.$fetch<{success: boolean, data: Word}>(apiUrl, {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      });
+      return response.data;
     } catch (error: any) {
       console.error('Failed to fetch word of the day:', error);
       throw error;
@@ -46,11 +60,18 @@ export class MiscService {
    * @returns Quote of the day object
    */
   async getQuoteOfTheDay(): Promise<Qotd> {
-    const apiUrl = `${this.apiBase}/qotd`;
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api';
+     const apiKey = (config.public.apiKey as string) || 'your-api-key';
+     const apiUrl = `${apiBase}/qotd`;
     
     try {
-      const data = await this.$fetch<Qotd>(apiUrl);
-      return data;
+      const response = await this.$fetch<{success: boolean, data: Qotd}>(apiUrl, {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      });
+      return response.data;
     } catch (error: any) {
       console.error('Failed to fetch quote of the day:', error);
       throw error;

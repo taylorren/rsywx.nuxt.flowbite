@@ -1,19 +1,26 @@
 import type { LatestReading, ReadingSummary } from '~/types/reading';
+import { useRuntimeConfig } from '#app';
 
 export class ReadingService {
-  private readonly apiBase = 'https://api.rsywx.com'; // Replace with your actual API base URL
+  private readonly $fetch: typeof globalThis.$fetch;
+  
+  constructor($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
+    this.$fetch = $fetch;
+  }
 
   async getReadingData(): Promise<ReadingSummary> {
-    const apiUrl = `${this.apiBase}/read/summary`; // Replace with your actual API endpoint
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api';
+     const apiKey = (config.public.apiKey as string) || 'your-api-key';
+     const apiUrl = `${apiBase}/read/summary`;
 
     try {
-      const { data, error } = await useFetch<ReadingSummary>(apiUrl);
-
-      if (error.value) {
-        throw error.value;
-      }
-
-      return data.value || { hc: 0, rc: 0 }; // Provide default values in case of an empty response
+      const response = await this.$fetch<{success: boolean, data: ReadingSummary}>(apiUrl, {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      });
+      return response.data || { hc: 0, rc: 0 }; // Provide default values in case of an empty response
     } catch (error: any) {
       console.error('Failed to fetch reading data:', error);
       throw error;
@@ -21,16 +28,18 @@ export class ReadingService {
   }
 
   async getLatestReading(): Promise<LatestReading> {
-    const apiUrl = `${this.apiBase}/read/latest`;
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api';
+     const apiKey = (config.public.apiKey as string) || 'your-api-key';
+     const apiUrl = `${apiBase}/read/latest`;
 
     try {
-      const { data, error } = await useFetch<LatestReading>(apiUrl);
-
-      if (error.value) {
-        throw error.value;
-      }
-
-      return data.value || {
+      const response = await this.$fetch<{success: boolean, data: LatestReading}>(apiUrl, {
+        headers: {
+          'X-API-Key': apiKey
+        }
+      });
+      return response.data || {
         hid: 0,
         bid: 0,
         reviewtitle: 'No reading yet',

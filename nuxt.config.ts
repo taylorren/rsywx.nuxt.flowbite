@@ -18,8 +18,10 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-02-28",
 
   runtimeConfig: {
+    // 公共配置（客户端和服务端都可用）
     public: {
-      apiBase: 'http://api.rsywx', // 这里可以改成你的实际 API 地址
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
+      apiKey: process.env.NUXT_API_KEY,
     }
   },
 });

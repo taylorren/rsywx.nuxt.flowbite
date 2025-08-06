@@ -41,35 +41,19 @@ export interface BooksSummary {
   bc: number;
   pc: string;
   wc: string;
+  vc: number;
 }
 
 export interface RandomBook {
   id: number;
-  place: number;
-  publisher: number;
   bookid: string;
   title: string;
   author: string;
-  region: string;
-  copyrighter: string;
-  translated: number;
-  purchdate: string;
-  price: number;
-  pubdate: string;
-  printdate: string;
-  ver: string;
-  deco: string;
-  kword: number;
-  page: number;
-  isbn: string;
-  category: string;
-  ol: string;
-  intro: string;
-  instock: number;
-  location: string;
-  vc: number;
-  lvt: string;
-  img: string;
+  publisher_name: string;
+  place_name: string;
+  cover_uri: string;
+  total_visits: number;
+  last_visited: string;
 };
 
 export interface RecentBook {
@@ -77,21 +61,23 @@ export interface RecentBook {
   bookid: string;
   vc: number;
   lvt: string;
-  city: string;
+  region: string;
 };
 
 export interface ForgetBook {
   title: string;
   bookid: string;
-  vc: number;
-  lvt: string;
+  author: string;
+  last_visited: string;
+  days_since_visit: number;
 };
 
 export const defaultForgetBook: ForgetBook = {
   title: "",
   bookid: "",
-  vc: 0,
-  lvt: ""
+  author: "",
+  last_visited: "",
+  days_since_visit: 0
 };
 
 // 根据/books/today接口返回的数据创建的类型

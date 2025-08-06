@@ -10,7 +10,7 @@
         &nbsp;&nbsp;手气不错
       </h2>
       <a v-if="randomBook" :href="`/books/${randomBook.bookid}.html`">
-        <img class="rounded-t-lg" :src="randomBook.img" :alt="randomBook.title" />
+        <img class="rounded-t-lg" :src="randomBook.cover_uri" :alt="randomBook.title" />
       </a>
       <br />
       <p class="mb-4 dark:text-gray-300" v-if="randomBook">
@@ -18,7 +18,7 @@
         <a :href="`/books/${randomBook.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
           《{{ randomBook.title }}》
         </a>
-        ，收录于{{ randomBook.purchdate }}。
+        ，由{{ randomBook.publisher_name }}出版。
       </p>
     </div>
     <div class="flex items-center">

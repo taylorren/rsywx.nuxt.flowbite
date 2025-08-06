@@ -19,7 +19,7 @@
           <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
             《{{ book?.title }}》
           </a>
-          ，上次访问时间是{{ book?.lvt }}，访客来自{{book?.city}}。
+          ，上次访问时间是{{ book?.lvt }}，访客来自{{book?.region}}。
         </p>
       </div>
       <a :href="`/books/${book?.bookid}.html`"

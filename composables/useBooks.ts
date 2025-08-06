@@ -38,10 +38,12 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   // 加载关键数据
   const loadSummary = async () => {
     try {
+      console.log('🔍 Starting to load book summary...');
       summary.value = await bookService.getBooksSummary();
+      console.log('✅ Book summary loaded successfully:', summary.value);
     } catch (error) {
       summaryError.value = error as Error;
-      console.error('Failed to fetch book summary:', error);
+      console.error('❌ Failed to fetch book summary:', error);
     }
   };
   
@@ -71,7 +73,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   // 刷新随机书籍的方法
   const refreshRandomBook = async () => {
     try {
-      randomBook.value = await bookService.getRandomBooks();
+      randomBook.value = await bookService.getRandomBooks(1, true); // Pass refresh=true
     } catch (error) {
       randomBookError.value = error as Error;
       console.error('Failed to fetch random book:', error);
@@ -119,10 +121,12 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   
   // 初始加载关键数据
   const initializeKeyData = async () => {
+    console.log('🚀 Initializing key data...');
     await Promise.all([
       loadSummary(),
       loadLatestBook()
     ]);
+    console.log('✅ Key data initialization completed');
   };
   
   return {

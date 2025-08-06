@@ -15,11 +15,11 @@
       </a>
       <br />
       <p class="mb-4 dark:text-gray-300">
-        久未访问的书籍是
+        久未访问的书籍是{{ book?.author }}的
         <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
           《{{ book?.title }}》
         </a>
-        ，上次访问时间是{{ book?.lvt }}，已有{{ formatNumber(book?.vc) }}次访问。
+        ，已经有{{ book?.days_since_visit }}天未访问。
       </p>
     </div>
     <a :href="`/books/${book?.bookid}.html`"

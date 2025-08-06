@@ -24,7 +24,11 @@
         <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
           {{ formatNumber(summary?.wc) }}
         </span>
-        千字。
+        千字，累计访问
+        <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+          {{ formatNumber(summary?.vc) }}
+        </span>
+        次。
       </p>
     </div>
     <a href="/books/list"

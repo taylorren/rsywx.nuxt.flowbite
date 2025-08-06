@@ -1,6 +1,22 @@
 <template>
   <div class="min-h-screen py-8">
     <div class="container mx-auto px-4">
+      <!-- API迁移通知 -->
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 dark:bg-yellow-900 dark:text-yellow-200">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm">
+              <strong>API迁移通知：</strong>后端API已重写，部分功能（如每日一词、访问统计等）暂时不可用。随机书籍功能已恢复。详情请查看 <a href="/API_MIGRATION.md" class="underline">API迁移指南</a>。
+            </p>
+          </div>
+        </div>
+      </div>
+      
       <h1 class="text-3xl font-bold mb-4 dark:text-white">任氏有无轩基本情况一览</h1>
 
       <!-- 藏书 Group -->
@@ -17,24 +33,36 @@
           <LatestBookCard :latestBook="latestBook" />
         </div>
         <!-- Random Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]" ref="randomBookRef">
-          <BookRandomCard :randomBook="randomBook?.[0]" @refresh="refreshRandomBook"/>
+        <div ref="randomBookRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <BookRandomCard :randomBook="randomBook?.[0] || null" @refresh="refreshRandomBook" />
         </div>
-        <!-- Recent Visit Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]" ref="recentVisitBookRef">
-          <RecentVisitBookCard :book="recentVisitBook?.[0]"/>
+        <div ref="recentVisitBookRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <RecentVisitBookCard :book="recentVisitBook?.[0] || null" />
         </div>
-        <!-- Forget Book Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]" ref="forgetBookRef">
-          <ForgetBookCard :book="forgetBook?.[0]"/>
+        <div ref="forgetBookRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <ForgetBookCard :book="forgetBook?.[0] || null" />
         </div>
-        <!-- Today Books Card -->
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]" ref="todayBooksRef">
-          <BookTodayCard :todayBooks="todayBooks || []"/>
+        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
+            <div class="text-center text-gray-500 dark:text-gray-400">
+              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p class="text-sm font-medium">今日书籍</p>
+              <p class="text-xs">暂时不可用</p>
+            </div>
+          </div>
         </div>
-        <!-- Visit Stats Card -->
-        <div class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]" ref="visitStatsRef">
-          <VisitStatsCard :visitStats="visitStats" />
+        <div class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]">
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
+            <div class="text-center text-gray-500 dark:text-gray-400">
+              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <p class="text-sm font-medium">访问统计</p>
+              <p class="text-xs">暂时不可用</p>
+            </div>
+          </div>
         </div>
         <!-- Add more 藏书 cards here -->
       </div>
@@ -42,13 +70,28 @@
       <!-- 读书 Group -->
       <h2 class="text-2xl font-semibold mb-2 dark:text-white">读书</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <!-- Reading Data Card -->
-        <div ref="readingDataRef">
-          <ReadingSummaryCard :readingData="readingData" />
+        <!-- 暂时不可用的读书功能 -->
+        <div>
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
+            <div class="text-center text-gray-500 dark:text-gray-400">
+              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <p class="text-sm font-medium">读书统计</p>
+              <p class="text-xs">暂时不可用</p>
+            </div>
+          </div>
         </div>
-        <!-- Latest Reading Card -->
-        <div ref="latestReadingRef">
-          <LatestReadingCard :latestReading="latestReading" />
+        <div>
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
+            <div class="text-center text-gray-500 dark:text-gray-400">
+              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 01-6 2.292m0-14.25v14.25" />
+              </svg>
+              <p class="text-sm font-medium">最新阅读</p>
+              <p class="text-xs">暂时不可用</p>
+            </div>
+          </div>
         </div>
         <!-- Add more 读书 cards here -->
       </div>
@@ -56,13 +99,28 @@
       <!-- 其他功能 Group -->
       <h2 class="text-2xl font-semibold mb-2 dark:text-white">其他功能</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <!-- QOTD Card -->
-        <div ref="qotdRef">
-          <QotdCard />
+        <!-- 暂时不可用的其他功能 -->
+        <div>
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
+            <div class="text-center text-gray-500 dark:text-gray-400">
+              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+              <p class="text-sm font-medium">每日一句</p>
+              <p class="text-xs">暂时不可用</p>
+            </div>
+          </div>
         </div>
-        <!-- WOTD Card -->
-        <div ref="wotdRef">
-          <WotdCard />
+        <div>
+          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
+            <div class="text-center text-gray-500 dark:text-gray-400">
+              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <p class="text-sm font-medium">每日一词</p>
+              <p class="text-xs">暂时不可用</p>
+            </div>
+          </div>
         </div>
         <!-- Add more cards here -->
       </div>
@@ -132,9 +190,6 @@ const {
   loadVisitStats
 } = useVisits();
 
-// 初始化关键数据
-initializeKeyData();
-
 // 创建元素引用
 const randomBookRef = ref<HTMLElement | null>(null);
 const recentVisitBookRef = ref<HTMLElement | null>(null);
@@ -145,11 +200,21 @@ const readingDataRef = ref<HTMLElement | null>(null);
 const latestReadingRef = ref<HTMLElement | null>(null);
 const qotdRef = ref<HTMLElement | null>(null);
 
+
 // 使用Intersection Observer管理延迟加载
 const { observe } = useIntersectionObserver();
 
 // 在组件挂载后设置观察者
 onMounted(() => {
+  console.log('🎯 Index page mounted, initializing data...');
+  console.log('📊 Current summary value:', summary.value);
+  
+  // 初始化关键数据
+  initializeKeyData();
+  
+  // 立即加载随机书籍，因为它通常在首屏可见
+  loadRandomBook();
+  
   // 观察所有需要延迟加载的组件
   observe(randomBookRef.value, loadRandomBook);
   observe(recentVisitBookRef.value, loadRecentVisitBook);
@@ -158,8 +223,15 @@ onMounted(() => {
   observe(visitStatsRef.value, loadVisitStats);
   observe(readingDataRef.value, loadReadingData);
   observe(latestReadingRef.value, loadLatestReading);
+
   // QotdCard组件会自行加载数据
   observe(qotdRef.value, () => {});
+  
+  // 添加一个延迟检查来看数据是否加载成功
+  setTimeout(() => {
+    console.log('⏰ After 2 seconds - Summary value:', summary.value);
+    console.log('⏰ After 2 seconds - Latest book:', latestBook.value);
+  }, 2000);
 });
 
 // 错误处理
