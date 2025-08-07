@@ -223,10 +223,54 @@ export class BookService {
         })();
     }
 
-    // 注意：新API暂时不支持今日书籍功能
+    // 获取今日书籍（历史上的今天购买的书籍）
     async getTodayBooks(): Promise<TodayBook[]> {
-        console.warn('Today books API is not available in the new API');
-        return [];
+        return await timedWithCategory('API: Today Books', 'api', async (): Promise<TodayBook[]> => {
+            const config = useRuntimeConfig();
+            const apiBase = config.public.apiBase || '/api';
+            const apiKey = (config.public.apiKey as string) || 'your-api-key';
+            const apiUrl = apiBase + "/books/today";
+
+            try {
+                const response = await this.$fetch<{success: boolean, data: any[], cached: boolean, date_info: any}>(apiUrl, {
+                    headers: {
+                        'X-API-Key': apiKey
+                    }
+                });
+
+                if (response.success && response.data && response.data.length > 0) {
+                    return response.data.map(item => ({
+                        id: item.id,
+                        place: item.place || 0,
+                        publisher: item.publisher || 0,
+                        bookid: item.bookid,
+                        title: item.title,
+                        author: item.author,
+                        region: item.region || '',
+                        copyrighter: item.copyrighter || '',
+                        translated: item.translated || 0,
+                        purchdate: item.purchdate,
+                        price: item.price || 0,
+                        pubdate: item.pubdate || '',
+                        printdate: item.printdate || '',
+                        ver: item.ver || '',
+                        deco: item.deco || '',
+                        kword: item.kword || 0,
+                        page: item.page || 0,
+                        isbn: item.isbn || '',
+                        category: item.category || '',
+                        ol: item.ol || '',
+                        intro: item.intro || '',
+                        instock: item.instock || 1,
+                        location: item.location || '未知'
+                    }));
+                }
+                return [];
+            } catch (error: any) {
+                console.error('Failed to fetch today books:', error);
+                return [];
+            }
+        })();
     }
 
 
@@ -322,6 +366,7 @@ export class BookService {
         randomBooks: RandomBook[];
         recentBooks: RecentBook[];
         forgetBooks: ForgetBook[];
+        todayBooks: TodayBook[];
     }> {
         console.log('🚀 Loading books data batch concurrently...');
 
@@ -332,7 +377,8 @@ export class BookService {
                 this.getLatestBook(),
                 this.getRandomBooks(1),
                 this.getRecentBooks(),
-                this.getForgetBooks()
+                this.getForgetBooks(),
+                this.getTodayBooks()
             ]);
 
             // Extract results with proper type handling
@@ -356,10 +402,14 @@ export class BookService {
                 ? results[4].value
                 : [];
 
+            const todayBooks = results[5].status === 'fulfilled'
+                ? results[5].value
+                : [];
+
             // Log any failures
             results.forEach((result, index) => {
                 if (result.status === 'rejected') {
-                    const apiNames = ['Books Summary', 'Latest Book', 'Random Books', 'Recent Books', 'Forgotten Books'];
+                    const apiNames = ['Books Summary', 'Latest Book', 'Random Books', 'Recent Books', 'Forgotten Books', 'Today Books'];
                     console.error(`❌ ${apiNames[index]} API failed:`, result.reason);
                 }
             });
@@ -371,7 +421,8 @@ export class BookService {
                 latestBook,
                 randomBooks,
                 recentBooks,
-                forgetBooks
+                forgetBooks,
+                todayBooks
             };
         } catch (error) {
             console.error('❌ Batch loading failed:', error);
@@ -381,7 +432,8 @@ export class BookService {
                 latestBook: defaultBook,
                 randomBooks: defaultRandomBook,
                 recentBooks: [],
-                forgetBooks: []
+                forgetBooks: [],
+                todayBooks: []
             };
         }
     }

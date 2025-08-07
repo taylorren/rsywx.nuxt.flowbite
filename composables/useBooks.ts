@@ -162,11 +162,13 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
       randomBook.value = batchData.randomBooks;
       recentVisitBook.value = batchData.recentBooks;
       forgetBook.value = batchData.forgetBooks;
+      todayBooks.value = batchData.todayBooks;
 
       // 标记所有数据为已加载
       randomBookLoaded.value = true;
       recentVisitBookLoaded.value = true;
       forgetBookLoaded.value = true;
+      todayBooksLoaded.value = true;
 
       console.log('✅ Optimized batch loading completed successfully');
     } catch (error) {

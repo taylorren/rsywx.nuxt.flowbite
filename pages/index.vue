@@ -11,7 +11,7 @@
           </div>
           <div class="ml-3">
             <p class="text-sm">
-              <strong>API迁移通知：</strong>后端API已重写，部分功能（如每日一词、访问统计等）暂时不可用。随机书籍功能已恢复。详情请查看 <a href="/API_MIGRATION.md" class="underline">API迁移指南</a>。
+              <strong>API迁移通知：</strong>后端API已重写，大部分功能已恢复。随机书籍功能、访问统计和每日一词已正常工作。详情请查看 <a href="/API_MIGRATION.md" class="underline">API迁移指南</a>。
             </p>
           </div>
         </div>
@@ -42,27 +42,11 @@
         <div ref="forgetBookRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <ForgetBookCard :book="forgetBook?.[0] || null" />
         </div>
-        <div class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
-          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
-            <div class="text-center text-gray-500 dark:text-gray-400">
-              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p class="text-sm font-medium">今日书籍</p>
-              <p class="text-xs">暂时不可用</p>
-            </div>
-          </div>
+        <div ref="todayBooksRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <BookTodayCard :todayBooks="todayBooks || []" />
         </div>
-        <div class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]">
-          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
-            <div class="text-center text-gray-500 dark:text-gray-400">
-              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <p class="text-sm font-medium">访问统计</p>
-              <p class="text-xs">暂时不可用</p>
-            </div>
-          </div>
+        <div ref="visitStatsRef" class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]">
+          <VisitStatsCard :visitStats="visitStats" />
         </div>
         <!-- Add more 藏书 cards here -->
       </div>
@@ -112,15 +96,7 @@
           </div>
         </div>
         <div>
-          <div class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md p-4 h-full flex items-center justify-center">
-            <div class="text-center text-gray-500 dark:text-gray-400">
-              <svg class="mx-auto h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <p class="text-sm font-medium">每日一词</p>
-              <p class="text-xs">暂时不可用</p>
-            </div>
-          </div>
+          <WotdCard />
         </div>
         <!-- Add more cards here -->
       </div>
@@ -247,62 +223,17 @@ onMounted(async () => {
     performanceAnalyzer.end('Component Rendering');
     performanceAnalyzer.end('Page Mount');
     
-    // Generate comprehensive performance reports after 4 seconds
-    setTimeout(async () => {
-      console.log('\n🎯 ===== COMPREHENSIVE PERFORMANCE ANALYSIS =====\n');
-      
-      // 1. Print to console for immediate viewing
-      performanceAnalyzer.printDetailedReport();
-      loadTimeAnalyzer.printLoadTimeBreakdown();
-      loadTimeAnalyzer.analyzeNavigationTiming();
-      
-      // 2. Prepare data status for report
-      const dataStatus = {
-        summary: summary.value,
-        latestBook: latestBook.value,
-        randomBook: randomBook.value,
-        recentVisit: recentVisitBook.value,
-        forgetBooks: forgetBook.value,
-        readingData: readingData.value,
-        latestReading: latestReading.value,
-        visitStats: visitStats.value
-      };
-      
-      // 3. Generate and save comprehensive report to files
-      try {
-        await generateAndSaveReport(dataStatus, 'rsywx-performance-analysis');
-        
-        console.log('\n📁 ===== PERFORMANCE REPORT SAVED =====');
-        console.log('✅ Two files have been downloaded:');
-        console.log('   📄 rsywx-performance-analysis-[timestamp].txt (Human-readable report)');
-        console.log('   📊 rsywx-performance-analysis-[timestamp].json (Machine-readable data)');
-        console.log('');
-        console.log('💡 Use these files to:');
-        console.log('   - Analyze the exact cause of your 6.5s load time');
-        console.log('   - Prioritize optimization efforts');
-        console.log('   - Track improvements after implementing fixes');
-        console.log('   - Share performance data with your team');
-        console.log('\n===============================================\n');
-        
-      } catch (error) {
-        console.error('❌ Failed to generate performance report:', error);
-        
-        // Fallback: show data status in console
-        console.log('📊 DATA STATUS CHECK:');
-        console.log('   Summary:', summary.value ? '✅ Loaded' : '❌ Failed');
-        console.log('   Latest Book:', latestBook.value ? '✅ Loaded' : '❌ Failed');
-        console.log('   Random Book:', randomBook.value ? '✅ Loaded' : '❌ Failed');
-        console.log('   Recent Visit:', recentVisitBook.value ? '✅ Loaded' : '❌ Failed');
-        console.log('   Forgotten Books:', forgetBook.value ? '✅ Loaded' : '❌ Failed');
-        
-        const cacheStats = networkOptimizer.getCacheStats();
-        console.log('\n📦 CACHE STATISTICS:');
-        console.log(`   Cached entries: ${cacheStats.size}`);
-        if (cacheStats.size > 0) {
-          console.log('   Cached resources:', cacheStats.entries);
-        }
-      }
-    }, 4000);
+    // Simple completion log after 2 seconds
+    setTimeout(() => {
+      console.log('✅ App loading completed successfully');
+      console.log('📊 Data Status:');
+      console.log('   Summary:', summary.value ? '✅ Loaded' : '❌ Failed');
+      console.log('   Latest Book:', latestBook.value ? '✅ Loaded' : '❌ Failed');
+      console.log('   Random Book:', randomBook.value ? '✅ Loaded' : '❌ Failed');
+      console.log('   Recent Visit:', recentVisitBook.value ? '✅ Loaded' : '❌ Failed');
+      console.log('   Forgotten Books:', forgetBook.value ? '✅ Loaded' : '❌ Failed');
+      console.log('   Today Books:', todayBooks.value ? '✅ Loaded' : '❌ Failed');
+    }, 2000);
     
   } catch (error) {
     loadTimeAnalyzer.endPhase('API Calls');

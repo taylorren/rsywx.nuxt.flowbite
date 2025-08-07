@@ -22,8 +22,23 @@
         <p class="text-2xl font-bold dark:text-white">{{ yesterdayVisits }}</p>
       </div>
       <div class="text-center">
-        <p class="text-sm text-gray-500 dark:text-gray-400">30天访问</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ periodDays }}天访问</p>
         <p class="text-2xl font-bold dark:text-white">{{ totalVisits }}</p>
+      </div>
+    </div>
+
+    <!-- 显示数据期间信息 (如果有新API数据) -->
+    <div v-if="visitHistoryData && visitHistoryData.period_info"
+      class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+      <div class="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
+        <div>
+          <span class="font-medium">统计期间:</span>
+          {{ formatDateRange(visitHistoryData.period_info.start_date, visitHistoryData.period_info.end_date) }}
+        </div>
+        <div>
+          <span class="font-medium">日均访问:</span>
+          {{ Math.round(visitHistoryData.period_info.total_visits / visitHistoryData.period_info.total_days) }}
+        </div>
       </div>
     </div>
   </div>
@@ -32,7 +47,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { visitService } from '~/services/visitService';
-import type { VisitStatsArray } from '~/types/visit';
+import type { VisitStatsArray, VisitHistoryResponse } from '~/types/visit';
 
 const props = defineProps<{
   visitStats?: VisitStatsArray | null;
@@ -40,19 +55,27 @@ const props = defineProps<{
 
 const loading = ref(false);
 const localVisitStats = ref<VisitStatsArray | null>(null);
+const visitHistoryData = ref<VisitHistoryResponse | null>(null);
 
 // 使用props或本地数据
 const visitData = computed(() => {
+  // 优先使用新的访问历史数据
+  if (visitHistoryData.value && visitHistoryData.value.data.length > 0) {
+    return visitHistoryData.value.data.map(item => ({
+      vc: item.visit_count,
+      vd: item.date
+    }));
+  }
   return props.visitStats || localVisitStats.value || [];
 });
 
 // 计算图表数据
 const chartData = computed(() => {
   if (!visitData.value || visitData.value.length === 0) return null;
-  
+
   const dates = visitData.value.map(item => formatDate(new Date(item.vd)));
   const counts = visitData.value.map(item => item.vc);
-  
+
   return {
     labels: dates,
     datasets: [
@@ -108,8 +131,21 @@ const yesterdayVisits = computed(() => {
 
 // 计算30天总访问量
 const totalVisits = computed(() => {
+  // 优先使用新API的period_info中的total_visits
+  if (visitHistoryData.value && visitHistoryData.value.period_info) {
+    return visitHistoryData.value.period_info.total_visits;
+  }
+  // 回退到计算总和
   if (!visitData.value || visitData.value.length === 0) return 0;
   return visitData.value.reduce((sum, item) => sum + item.vc, 0);
+});
+
+// 计算统计期间天数
+const periodDays = computed(() => {
+  if (visitHistoryData.value && visitHistoryData.value.period_info) {
+    return visitHistoryData.value.period_info.total_days;
+  }
+  return 30; // 默认30天
 });
 
 // 格式化日期
@@ -119,17 +155,39 @@ function formatDate(date: Date): string {
   return `${month}/${day}`;
 }
 
+// 格式化日期范围
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const formatShort = (date: Date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}/${day}`;
+  };
+
+  return `${formatShort(start)} - ${formatShort(end)}`;
+}
+
 // 加载访问统计数据
 async function loadVisitStats() {
   if (props.visitStats && props.visitStats.length > 0) {
     return; // 如果已经通过props提供了数据，则不需要再次加载
   }
-  
+
   loading.value = true;
   try {
-    localVisitStats.value = await visitService.getVisitStats();
+    // 优先使用新的访问历史API
+    visitHistoryData.value = await visitService.getVisitHistory(30);
+    // console.log('✅ Visit history data loaded:', visitHistoryData.value); // Commented out for production
   } catch (error) {
-    console.error('Failed to fetch visit stats:', error);
+    console.error('Failed to fetch visit history, falling back to legacy API:', error);
+    try {
+      // 回退到旧API
+      localVisitStats.value = await visitService.getVisitStats();
+    } catch (legacyError) {
+      console.error('Failed to fetch visit stats:', legacyError);
+    }
   } finally {
     loading.value = false;
   }

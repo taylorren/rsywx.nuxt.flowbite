@@ -42,6 +42,7 @@ interface PerformanceReport {
         randomBook: boolean;
         recentVisit: boolean;
         forgetBooks: boolean;
+        todayBooks: boolean;
     };
     cacheStats: {
         size: number;
@@ -93,7 +94,8 @@ class PerformanceReporter {
                 latestBook: !!dataStatus.latestBook,
                 randomBook: !!dataStatus.randomBook,
                 recentVisit: !!dataStatus.recentVisit,
-                forgetBooks: !!dataStatus.forgetBooks
+                forgetBooks: !!dataStatus.forgetBooks,
+                todayBooks: !!dataStatus.todayBooks
             },
             cacheStats,
             navigationTiming,

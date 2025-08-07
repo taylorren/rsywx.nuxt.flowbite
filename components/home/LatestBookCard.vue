@@ -10,7 +10,7 @@
         &nbsp;&nbsp;最新藏书
       </h2>
       <a :href="`/books/${latestBook?.bookid}.html`">
-        <img class="rounded-t-lg" :src="`https://api.rsywx.com/covers/${latestBook?.bookid}.jpg`"
+        <img class="rounded-t-lg" :src="`/covers/${latestBook?.bookid?.padStart(5, '0')}.webp`"
           :alt="`${latestBook?.title}`" />
       </a>
       <br />

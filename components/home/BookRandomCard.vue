@@ -10,7 +10,7 @@
         &nbsp;&nbsp;手气不错
       </h2>
       <a v-if="randomBook" :href="`/books/${randomBook.bookid}.html`">
-        <img class="rounded-t-lg" :src="randomBook.cover_uri" :alt="randomBook.title" />
+        <img class="rounded-t-lg" :src="`/covers/${randomBook.bookid.padStart(5, '0')}.webp`" :alt="randomBook.title" />
       </a>
       <br />
       <p class="mb-4 dark:text-gray-300" v-if="randomBook">

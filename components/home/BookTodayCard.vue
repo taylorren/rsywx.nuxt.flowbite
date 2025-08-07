@@ -31,13 +31,13 @@
               <div class="ml-1 text-sm text-gray-600 dark:text-gray-400">
                 <div>收藏于
                   <span 
-                    class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer"
+                    class="inline-flex items-center rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-600 dark:text-emerald-100 cursor-pointer"
                     :title="formatDate(book.purchdate)"
                   >
                     {{ calculateYearsAgo(book.purchdate) }}
                   </span>
                   年前，位置是
-                  <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
+                  <span class="inline-flex items-center rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-600 dark:text-emerald-100">
                     {{ book.location || '未知' }}
                   </span>
                 </div>

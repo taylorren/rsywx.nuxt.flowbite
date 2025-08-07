@@ -10,7 +10,7 @@
         &nbsp;&nbsp;久未访问
       </h2>
       <a :href="`/books/${book?.bookid}.html`">
-        <img class="rounded-t-lg" :src="`https://api.rsywx.com/covers/${book?.bookid}.jpg`"
+        <img class="rounded-t-lg" :src="`/covers/${book?.bookid?.padStart(5, '0')}.webp`"
           :alt="`${book?.title}`" />
       </a>
       <br />
