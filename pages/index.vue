@@ -148,12 +148,17 @@ import QotdCard from '~/components/home/QotdCard.vue';
 import WotdCard from '~/components/home/WotdCard.vue';
 
 // 导入组合式API
-import { useBooks } from '~/composables/useBooks';
-import { useReading } from '~/composables/useReading';
-import { useVisits } from '~/composables/useVisits';
+import { useAppData } from '~/composables/useAppData';
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver';
+import { performanceAnalyzer, timedWithCategory } from '~/utils/performanceAnalyzer';
+import { quickOptimizations, networkOptimizer } from '~/utils/networkOptimizer';
+import { loadTimeAnalyzer, analyzeFullLoadTime } from '~/utils/loadTimeBreakdown';
+import { generateAndSaveReport, performanceReporter } from '~/utils/performanceReporter';
 
-// 使用组合式API
+// 使用优化的应用数据管理
+const appData = useAppData();
+
+// 解构需要的数据和方法
 const {
   summary,
   summaryError,
@@ -167,28 +172,20 @@ const {
   forgetBookError,
   todayBooks,
   todayBooksError,
-  loadRandomBook,
-  loadRecentVisitBook,
-  loadForgetBook,
-  loadTodayBooks,
-  refreshRandomBook,
-  initializeKeyData
-} = useBooks();
+  refreshRandomBook
+} = appData.books;
 
 const {
   readingData,
   readingError,
   latestReading,
-  latestReadingError,
-  loadReadingData,
-  loadLatestReading
-} = useReading();
+  latestReadingError
+} = appData.reading;
 
 const {
   visitStats,
-  visitStatsError,
-  loadVisitStats
-} = useVisits();
+  visitStatsError
+} = appData.visits;
 
 // 创建元素引用
 const randomBookRef = ref<HTMLElement | null>(null);
@@ -204,35 +201,141 @@ const qotdRef = ref<HTMLElement | null>(null);
 // 使用Intersection Observer管理延迟加载
 const { observe } = useIntersectionObserver();
 
-// 在组件挂载后设置观察者
-onMounted(() => {
-  console.log('🎯 Index page mounted, initializing data...');
-  console.log('📊 Current summary value:', summary.value);
+// 在组件挂载后使用优化的加载策略
+onMounted(async () => {
+  // 🎯 Start comprehensive performance analysis
+  performanceAnalyzer.startPageLoad();
+  loadTimeAnalyzer.startAnalysis();
+  performanceAnalyzer.start('Page Mount', 'processing');
   
-  // 初始化关键数据
-  initializeKeyData();
+  console.log('🎯 Index page mounted, starting comprehensive performance analysis...');
   
-  // 立即加载随机书籍，因为它通常在首屏可见
-  loadRandomBook();
+  // Track load phases for detailed breakdown
+  loadTimeAnalyzer.startPhase('Initial Connection');
   
-  // 观察所有需要延迟加载的组件
-  observe(randomBookRef.value, loadRandomBook);
-  observe(recentVisitBookRef.value, loadRecentVisitBook);
-  observe(forgetBookRef.value, loadForgetBook);
-  observe(todayBooksRef.value, loadTodayBooks);
-  observe(visitStatsRef.value, loadVisitStats);
-  observe(readingDataRef.value, loadReadingData);
-  observe(latestReadingRef.value, loadLatestReading);
-
-  // QotdCard组件会自行加载数据
-  observe(qotdRef.value, () => {});
+  // Apply quick optimizations first
+  loadTimeAnalyzer.startPhase('Network Optimizations');
+  await quickOptimizations();
+  loadTimeAnalyzer.endPhase('Network Optimizations');
   
-  // 添加一个延迟检查来看数据是否加载成功
-  setTimeout(() => {
-    console.log('⏰ After 2 seconds - Summary value:', summary.value);
-    console.log('⏰ After 2 seconds - Latest book:', latestBook.value);
-  }, 2000);
+  // Mark critical path operations
+  performanceAnalyzer.markCritical('API: Books Summary');
+  performanceAnalyzer.markCritical('API: Latest Book');
+  
+  // Track external resource loading
+  loadTimeAnalyzer.startPhase('External Resources');
+  await trackExternalResources();
+  loadTimeAnalyzer.endPhase('External Resources');
+  
+  // Track component rendering
+  loadTimeAnalyzer.startPhase('Component Rendering');
+  performanceAnalyzer.start('Component Rendering', 'rendering');
+  
+  try {
+    // Track API calls phase
+    loadTimeAnalyzer.startPhase('API Calls');
+    
+    // 使用优化的加载策略
+    await timedWithCategory('App Data Loading', 'processing', async () => {
+      await appData.loadAllData();
+    })();
+    
+    loadTimeAnalyzer.endPhase('API Calls');
+    loadTimeAnalyzer.endPhase('Component Rendering');
+    loadTimeAnalyzer.endPhase('Initial Connection');
+    
+    performanceAnalyzer.end('Component Rendering');
+    performanceAnalyzer.end('Page Mount');
+    
+    // Generate comprehensive performance reports after 4 seconds
+    setTimeout(async () => {
+      console.log('\n🎯 ===== COMPREHENSIVE PERFORMANCE ANALYSIS =====\n');
+      
+      // 1. Print to console for immediate viewing
+      performanceAnalyzer.printDetailedReport();
+      loadTimeAnalyzer.printLoadTimeBreakdown();
+      loadTimeAnalyzer.analyzeNavigationTiming();
+      
+      // 2. Prepare data status for report
+      const dataStatus = {
+        summary: summary.value,
+        latestBook: latestBook.value,
+        randomBook: randomBook.value,
+        recentVisit: recentVisitBook.value,
+        forgetBooks: forgetBook.value,
+        readingData: readingData.value,
+        latestReading: latestReading.value,
+        visitStats: visitStats.value
+      };
+      
+      // 3. Generate and save comprehensive report to files
+      try {
+        await generateAndSaveReport(dataStatus, 'rsywx-performance-analysis');
+        
+        console.log('\n📁 ===== PERFORMANCE REPORT SAVED =====');
+        console.log('✅ Two files have been downloaded:');
+        console.log('   📄 rsywx-performance-analysis-[timestamp].txt (Human-readable report)');
+        console.log('   📊 rsywx-performance-analysis-[timestamp].json (Machine-readable data)');
+        console.log('');
+        console.log('💡 Use these files to:');
+        console.log('   - Analyze the exact cause of your 6.5s load time');
+        console.log('   - Prioritize optimization efforts');
+        console.log('   - Track improvements after implementing fixes');
+        console.log('   - Share performance data with your team');
+        console.log('\n===============================================\n');
+        
+      } catch (error) {
+        console.error('❌ Failed to generate performance report:', error);
+        
+        // Fallback: show data status in console
+        console.log('📊 DATA STATUS CHECK:');
+        console.log('   Summary:', summary.value ? '✅ Loaded' : '❌ Failed');
+        console.log('   Latest Book:', latestBook.value ? '✅ Loaded' : '❌ Failed');
+        console.log('   Random Book:', randomBook.value ? '✅ Loaded' : '❌ Failed');
+        console.log('   Recent Visit:', recentVisitBook.value ? '✅ Loaded' : '❌ Failed');
+        console.log('   Forgotten Books:', forgetBook.value ? '✅ Loaded' : '❌ Failed');
+        
+        const cacheStats = networkOptimizer.getCacheStats();
+        console.log('\n📦 CACHE STATISTICS:');
+        console.log(`   Cached entries: ${cacheStats.size}`);
+        if (cacheStats.size > 0) {
+          console.log('   Cached resources:', cacheStats.entries);
+        }
+      }
+    }, 4000);
+    
+  } catch (error) {
+    loadTimeAnalyzer.endPhase('API Calls');
+    loadTimeAnalyzer.endPhase('Component Rendering');
+    loadTimeAnalyzer.endPhase('Initial Connection');
+    performanceAnalyzer.end('Component Rendering', error as Error);
+    performanceAnalyzer.end('Page Mount', error as Error);
+    console.error('❌ Page loading failed:', error);
+  }
 });
+
+// Track external resource loading performance
+async function trackExternalResources() {
+  const externalResources = [
+    'https://api.rsywx.com/covers/undefined.jpg',
+    'https://mirrors.creativecommons.org/presskit/icons/cc.svg',
+    'https://mirrors.creativecommons.org/presskit/icons/by.svg',
+    'https://mirrors.creativecommons.org/presskit/icons/nc.svg',
+    'https://mirrors.creativecommons.org/presskit/icons/nd.svg'
+  ];
+  
+  for (const resource of externalResources) {
+    const resourceName = `External: ${resource.split('/').pop()}`;
+    performanceAnalyzer.start(resourceName, 'network', { url: resource });
+    
+    try {
+      const response = await fetch(resource, { method: 'HEAD' });
+      performanceAnalyzer.end(resourceName);
+    } catch (error) {
+      performanceAnalyzer.end(resourceName, error as Error);
+    }
+  }
+}
 
 // 错误处理
 if (summaryError.value) console.error('Failed to fetch book summary:', summaryError.value);

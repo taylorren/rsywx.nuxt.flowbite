@@ -48,6 +48,24 @@ export function useReading() {
     }
   };
   
+  // 批量加载所有阅读数据
+  const loadAllReadingData = async () => {
+    console.log('📚 Loading all reading data concurrently...');
+    const startTime = performance.now();
+    
+    try {
+      await Promise.allSettled([
+        loadReadingData(),
+        loadLatestReading()
+      ]);
+      
+      const endTime = performance.now();
+      console.log(`✅ All reading data loaded in ${(endTime - startTime).toFixed(2)}ms`);
+    } catch (error) {
+      console.error('❌ Error loading reading data:', error);
+    }
+  };
+
   return {
     // 状态
     readingData,
@@ -59,6 +77,7 @@ export function useReading() {
     
     // 方法
     loadReadingData,
-    loadLatestReading
+    loadLatestReading,
+    loadAllReadingData
   };
 }
