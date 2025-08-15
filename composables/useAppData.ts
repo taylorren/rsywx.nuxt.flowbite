@@ -47,9 +47,9 @@ export function useAppData() {
     
     try {
       // Load all non-critical data in parallel for maximum speed
-      await Promise.allSettled([
-        // Book-related non-critical data (using optimized batch loading)
-        books.loadAllBooksDataOptimized(),
+      const results = await Promise.allSettled([
+        // Book-related non-critical data (using individual loading to avoid conflicts)
+        books.loadAllNonCriticalData(),
         
         // Reading data
         reading.loadAllReadingData(),
@@ -61,6 +61,9 @@ export function useAppData() {
         qotd.fetchQotd(),
         wotd.fetchWotd()
       ]);
+      
+      // Log any failures for debugging
+      const taskNames = ['Books Non-Critical', 'Reading Data', 'Visit Stats', 'QOTD', 'WOTD'];
       
       const endTime = performance.now();
       console.log(`✅ All non-critical data loaded in ${(endTime - startTime).toFixed(2)}ms`);
@@ -76,7 +79,6 @@ export function useAppData() {
    */
   const loadAllData = async () => {
     performanceMonitor.start('Total App Load Time');
-    console.log('🎯 Starting optimized data loading strategy...');
     
     try {
       // Step 1: Load critical data first (users see something immediately)
@@ -88,13 +90,10 @@ export function useAppData() {
         performanceMonitor.end('Total App Load Time');
         performanceMonitor.printSummary();
       }).catch(error => {
-        console.error('Non-critical data loading failed:', error);
         performanceMonitor.end('Total App Load Time', error as Error);
       });
       
-      console.log(`🎉 Optimized loading strategy initiated - critical data loaded, non-critical loading in background`);
     } catch (error) {
-      console.error('❌ Error in optimized loading strategy:', error);
       performanceMonitor.end('Total App Load Time', error as Error);
     }
   };

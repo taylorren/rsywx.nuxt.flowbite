@@ -1,7 +1,7 @@
 // composables/useBooks.ts
 import { ref, nextTick } from 'vue';
 import { BookService } from '~/services/bookService';
-import type { BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook } from '~/types/book';
+import type { BooksSummary, LatestBook, RandomBook, RecentBook, ForgetBook, TodayBook } from '~/types/book';
 
 /**
  * 提供书籍相关功能的组合式API
@@ -15,7 +15,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   const summary = ref<BooksSummary | null>(null);
   const summaryError = ref<Error | null>(null);
 
-  const latestBook = ref<any | null>(null);
+  const latestBook = ref<LatestBook | null>(null);
   const latestBookError = ref<Error | null>(null);
 
   // 非关键数据（延迟加载）
@@ -38,9 +38,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   // 加载关键数据
   const loadSummary = async () => {
     try {
-      console.log('🔍 Starting to load book summary...');
       summary.value = await bookService.getBooksSummary();
-      console.log('✅ Book summary loaded successfully:', summary.value);
     } catch (error) {
       summaryError.value = error as Error;
       console.error('❌ Failed to fetch book summary:', error);
@@ -58,30 +56,34 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
 
   // 加载非关键数据的方法
   const loadRandomBook = async () => {
-    if (randomBookLoaded.value) return;
+    if (randomBookLoaded.value) {
+      return;
+    }
 
     try {
-      randomBook.value = await bookService.getRandomBooks();
+      randomBook.value = await bookService.getRandomBooks(4); // Get 4 random books
       randomBookLoaded.value = true;
       await nextTick(); // 等待DOM更新
     } catch (error) {
       randomBookError.value = error as Error;
-      console.error('Failed to fetch random book:', error);
+      console.error('❌ Failed to fetch random books:', error);
     }
   };
 
   // 刷新随机书籍的方法
   const refreshRandomBook = async () => {
     try {
-      randomBook.value = await bookService.getRandomBooks(1, true); // Pass refresh=true
+      randomBook.value = await bookService.getRandomBooks(4, true); // Get 4 random books with refresh
     } catch (error) {
       randomBookError.value = error as Error;
-      console.error('Failed to fetch random book:', error);
+      console.error('❌ Failed to refresh random books:', error);
     }
   };
 
   const loadRecentVisitBook = async () => {
-    if (recentVisitBookLoaded.value) return;
+    if (recentVisitBookLoaded.value) {
+      return;
+    }
 
     try {
       recentVisitBook.value = await bookService.getRecentBooks();
@@ -89,12 +91,14 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
       await nextTick(); // 等待DOM更新
     } catch (error) {
       recentVisitBookError.value = error as Error;
-      console.error('Failed to fetch recent visit book:', error);
+      console.error('❌ Failed to fetch recent visit book:', error);
     }
   };
 
   const loadForgetBook = async () => {
-    if (forgetBookLoaded.value) return;
+    if (forgetBookLoaded.value) {
+      return;
+    }
 
     try {
       forgetBook.value = await bookService.getForgetBooks();
@@ -102,12 +106,14 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
       await nextTick(); // 等待DOM更新
     } catch (error) {
       forgetBookError.value = error as Error;
-      console.error('Failed to fetch forget book:', error);
+      console.error('❌ Failed to fetch forget book:', error);
     }
   };
 
   const loadTodayBooks = async () => {
-    if (todayBooksLoaded.value) return;
+    if (todayBooksLoaded.value) {
+      return;
+    }
 
     try {
       todayBooks.value = await bookService.getTodayBooks();
@@ -115,32 +121,46 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
       await nextTick(); // 等待DOM更新
     } catch (error) {
       todayBooksError.value = error as Error;
-      console.error('Failed to fetch today books:', error);
+      console.error('❌ Failed to fetch today books:', error);
     }
   };
 
   // 初始加载关键数据
   const initializeKeyData = async () => {
-    console.log('🚀 Initializing key data...');
     await Promise.all([
       loadSummary(),
       loadLatestBook()
     ]);
-    console.log('✅ Key data initialization completed');
+  };
+
+  // 重置加载状态标志
+  const resetLoadedFlags = () => {
+    randomBookLoaded.value = false;
+    recentVisitBookLoaded.value = false;
+    forgetBookLoaded.value = false;
+    todayBooksLoaded.value = false;
   };
 
   // 批量加载所有非关键数据
   const loadAllNonCriticalData = async () => {
-    console.log('🔄 Loading all non-critical data concurrently...');
     const startTime = performance.now();
 
     try {
-      await Promise.allSettled([
+      const results = await Promise.allSettled([
         loadRandomBook(),
         loadRecentVisitBook(),
         loadForgetBook(),
         loadTodayBooks()
       ]);
+
+      // Log individual results for debugging
+      const taskNames = ['Random Book', 'Recent Visit Book', 'Forget Book', 'Today Books'];
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          console.error(`❌ ${taskNames[index]} failed:`, result.reason);
+        } else {
+        }
+      });
 
       const endTime = performance.now();
       console.log(`✅ All non-critical data loaded in ${(endTime - startTime).toFixed(2)}ms`);
@@ -151,8 +171,6 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
 
   // 使用批量API优化加载所有书籍数据
   const loadAllBooksDataOptimized = async () => {
-    console.log('⚡ Loading all books data using optimized batch API...');
-
     try {
       const batchData = await bookService.loadBooksDataBatch();
 
@@ -170,11 +188,11 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
       forgetBookLoaded.value = true;
       todayBooksLoaded.value = true;
 
-      console.log('✅ Optimized batch loading completed successfully');
     } catch (error) {
       console.error('❌ Optimized batch loading failed:', error);
-      // 回退到单独加载
+      // 重置标志并回退到单独加载
       console.log('🔄 Falling back to individual API calls...');
+      resetLoadedFlags();
       await loadAllNonCriticalData();
     }
   };
@@ -206,6 +224,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
     loadRecentVisitBook,
     loadForgetBook,
     loadTodayBooks,
+    resetLoadedFlags,
     initializeKeyData,
     loadAllNonCriticalData,
     loadAllBooksDataOptimized

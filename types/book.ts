@@ -49,6 +49,7 @@ export interface RandomBook {
   bookid: string;
   title: string;
   author: string;
+  region: string;
   publisher_name: string;
   place_name: string;
   cover_uri: string;
@@ -56,26 +57,58 @@ export interface RandomBook {
   last_visited: string;
 };
 
-export interface RecentBook {
-  title: string;
+export interface LatestBook {
+  id: number;
   bookid: string;
-  vc: number;
-  lvt: string;
+  title: string;
+  author: string;
+  cover_uri: string;
+  translated: number;
+  copyrighter: string;
   region: string;
+  location: string;
+  purchdate: string;
+  price: number;
+};
+
+export interface RecentBook {
+  id: number;
+  bookid: string;
+  title: string;
+  author: string;
+  translated: boolean;
+  copyrighter: string | null;
+  region: string;
+  location: string;
+  cover_uri: string;
+  last_visited: string;
+  visit_country: string;
 };
 
 export interface ForgetBook {
-  title: string;
+  id: number;
   bookid: string;
+  title: string;
   author: string;
+  translated: boolean;
+  copyrighter: string | null;
+  region: string;
+  location: string;
+  cover_uri: string;
   last_visited: string;
   days_since_visit: number;
 };
 
 export const defaultForgetBook: ForgetBook = {
-  title: "",
+  id: 0,
   bookid: "",
+  title: "",
   author: "",
+  translated: false,
+  copyrighter: null,
+  region: "",
+  location: "",
+  cover_uri: "",
   last_visited: "",
   days_since_visit: 0
 };

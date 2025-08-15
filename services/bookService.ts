@@ -1,5 +1,5 @@
 // filepath: services/bookService.ts
-import type { Book, BooksSummary, RandomBook, RecentBook, ForgetBook, TodayBook, BookTags } from '~/types/book';
+import type { Book, BooksSummary, LatestBook, RandomBook, RecentBook, ForgetBook, TodayBook, BookTags } from '~/types/book';
 import { useRuntimeConfig } from '#app';
 import { timed, measureConcurrent } from '~/utils/performance';
 import { timedWithCategory, performanceAnalyzer } from '~/utils/performanceAnalyzer';
@@ -65,19 +65,15 @@ export class BookService {
     async getBooksSummary(): Promise<BooksSummary> {
         return await timedWithCategory('API: Books Summary', 'api', async (): Promise<BooksSummary> => {
             const config = useRuntimeConfig();
-            console.log('📋 Runtime config:', config);
             const apiBase = config.public.apiBase || '/api';
             const apiKey = (config.public.apiKey as string) || 'your-api-key';
             const apiUrl = apiBase + "/books/status";
-            console.log('🌐 API URL:', apiUrl);
-            console.log('🔑 API Key:', apiKey ? apiKey.substring(0, 8) + '...' : 'NOT SET');
             try {
                 const response = await this.$fetch<{ success: boolean, data: BooksSummary }>(apiUrl, {
                     headers: {
                         'X-API-Key': apiKey
                     }
                 });
-                console.log('📊 API Response:', response);
                 // Map the API response to the expected BooksSummary format
                 // API returns: { total_books: number, total_pages: number, total_kwords: number }
                 // Component expects: { bc: number, pc: string, wc: string }
@@ -88,7 +84,6 @@ export class BookService {
                     wc: (apiData?.total_kwords || 0).toString(),
                     vc: apiData?.total_visits || 0
                 };
-                console.log('🔄 Mapped data:', mappedData);
                 return mappedData;
             } catch (error: any) {
                 console.error('❌ Failed to fetch book summary:', error);
@@ -97,7 +92,7 @@ export class BookService {
         })();
     }
 
-    async getLatestBook(): Promise<Book> {
+    async getLatestBook(): Promise<LatestBook> {
         return await timedWithCategory('API: Latest Book', 'api', async (): Promise<Book> => {
             const config = useRuntimeConfig();
             const apiBase = config.public.apiBase || '/api';
@@ -109,22 +104,36 @@ export class BookService {
                         'X-API-Key': apiKey
                     }
                 });
-                // 从数组中取第一个元素，并转换为Book格式
+                // 从数组中取第一个元素，并转换为LatestBook格式
                 const latestBookData = response.data?.[0];
                 if (latestBookData) {
                     return {
-                        ...defaultBook,
                         id: latestBookData.id,
                         bookid: latestBookData.bookid,
                         title: latestBookData.title,
                         author: latestBookData.author,
+                        cover_uri: latestBookData.cover_uri,
+                        translated: latestBookData.translated,
+                        copyrighter: latestBookData.copyrighter,
+                        region: latestBookData.region,
+                        location: latestBookData.location,
                         purchdate: latestBookData.purchdate,
-                        price: latestBookData.price,
-                        pu_name: latestBookData.publisher_name,
-                        pu_place: latestBookData.place_name
+                        price: latestBookData.price
                     };
                 }
-                return defaultBook;
+                return {
+                    id: 0,
+                    bookid: '',
+                    title: '',
+                    author: '',
+                    cover_uri: '',
+                    translated: 0,
+                    copyrighter: '',
+                    region: '',
+                    location: '',
+                    purchdate: '',
+                    price: 0
+                };
             } catch (error: any) {
                 console.error('Failed to fetch latest book:', error);
                 throw error;
@@ -176,11 +185,17 @@ export class BookService {
 
                 if (response.success && response.data && response.data.length > 0) {
                     return response.data.map(item => ({
-                        title: item.title,
+                        id: item.id,
                         bookid: item.bookid,
-                        vc: item.vc || 0,
-                        lvt: item.last_visited || '',
-                        region: item.region || '未知'
+                        title: item.title,
+                        author: item.author || '未知',
+                        translated: item.translated || false,
+                        copyrighter: item.copyrighter || null,
+                        region: item.region || '未知',
+                        location: item.location || '未知',
+                        cover_uri: item.cover_uri || '',
+                        last_visited: item.last_visited || '',
+                        visit_country: item.visit_country || ''
                     }));
                 }
                 return [];
@@ -208,9 +223,15 @@ export class BookService {
 
                 if (response.success && response.data && response.data.length > 0) {
                     return response.data.map(item => ({
-                        title: item.title,
+                        id: item.id,
                         bookid: item.bookid,
+                        title: item.title,
                         author: item.author || '未知',
+                        translated: item.translated || false,
+                        copyrighter: item.copyrighter || null,
+                        region: item.region || '未知',
+                        location: item.location || '未知',
+                        cover_uri: item.cover_uri || '',
                         last_visited: item.last_visited || '',
                         days_since_visit: item.days_since_visit || 0
                     }));
@@ -362,7 +383,7 @@ export class BookService {
      */
     async loadBooksDataBatch(): Promise<{
         summary: BooksSummary;
-        latestBook: Book;
+        latestBook: LatestBook;
         randomBooks: RandomBook[];
         recentBooks: RecentBook[];
         forgetBooks: ForgetBook[];
@@ -375,7 +396,7 @@ export class BookService {
             const results = await Promise.allSettled([
                 this.getBooksSummary(),
                 this.getLatestBook(),
-                this.getRandomBooks(1),
+                this.getRandomBooks(4), // Get 4 random books for the new layout
                 this.getRecentBooks(),
                 this.getForgetBooks(),
                 this.getTodayBooks()

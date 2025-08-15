@@ -12,7 +12,7 @@ export class ReadingService {
     const config = useRuntimeConfig();
     const apiBase = config.public.apiBase || '/api';
      const apiKey = (config.public.apiKey as string) || 'your-api-key';
-     const apiUrl = `${apiBase}/read/summary`;
+     const apiUrl = `${apiBase}/readings/summary`;
 
     try {
       const response = await this.$fetch<{success: boolean, data: ReadingSummary}>(apiUrl, {
@@ -20,40 +20,34 @@ export class ReadingService {
           'X-API-Key': apiKey
         }
       });
-      return response.data || { hc: 0, rc: 0 }; // Provide default values in case of an empty response
+      return response.data || { 
+        books_read: 0, 
+        reviews_written: 0,
+        reading_period: {
+          earliest_date: '',
+          latest_date: '',
+          total_days: 0
+        }
+      };
     } catch (error: any) {
       console.error('Failed to fetch reading data:', error);
       throw error;
     }
   }
 
-  async getLatestReading(): Promise<LatestReading> {
+  async getLatestReading(count: number = 1): Promise<LatestReading[]> {
     const config = useRuntimeConfig();
     const apiBase = config.public.apiBase || '/api';
      const apiKey = (config.public.apiKey as string) || 'your-api-key';
-     const apiUrl = `${apiBase}/read/latest`;
+     const apiUrl = `${apiBase}/readings/latest/${count}`;
 
     try {
-      const response = await this.$fetch<{success: boolean, data: LatestReading}>(apiUrl, {
+      const response = await this.$fetch<{success: boolean, data: LatestReading[]}>(apiUrl, {
         headers: {
           'X-API-Key': apiKey
         }
       });
-      return response.data || {
-        hid: 0,
-        bid: 0,
-        reviewtitle: 'No reading yet',
-        create_at: '',
-        display: 0,
-        id: -1,
-        title: 'No reading yet',
-        datein: '',
-        uri: '',
-        feature: '',
-        book_reviewcol: null,
-        book_title: '',
-        book_bookid: ''
-      };
+      return response.data || [];
     } catch (error: any) {
       console.error('Failed to fetch latest reading:', error);
       throw error;

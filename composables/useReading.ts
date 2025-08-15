@@ -16,7 +16,7 @@ export function useReading() {
   const readingDataLoaded = ref(false);
   
   // 最新阅读
-  const latestReading = ref<LatestReading | null>(null);
+  const latestReading = ref<LatestReading[]>([]);
   const latestReadingError = ref<Error | null>(null);
   const latestReadingLoaded = ref(false);
   
@@ -35,22 +35,22 @@ export function useReading() {
   };
   
   // 加载最新阅读
-  const loadLatestReading = async () => {
+  const loadLatestReading = async (count: number = 5) => {
     if (latestReadingLoaded.value) return;
     
     try {
-      latestReading.value = await readingService.getLatestReading();
+      
+      latestReading.value = await readingService.getLatestReading(count);
       latestReadingLoaded.value = true;
       await nextTick(); // 等待DOM更新
     } catch (error) {
       latestReadingError.value = error as Error;
-      console.error('Failed to fetch latest reading:', error);
+      console.error('❌ Failed to fetch latest reading:', error);
     }
   };
   
   // 批量加载所有阅读数据
   const loadAllReadingData = async () => {
-    console.log('📚 Loading all reading data concurrently...');
     const startTime = performance.now();
     
     try {
@@ -60,7 +60,6 @@ export function useReading() {
       ]);
       
       const endTime = performance.now();
-      console.log(`✅ All reading data loaded in ${(endTime - startTime).toFixed(2)}ms`);
     } catch (error) {
       console.error('❌ Error loading reading data:', error);
     }

@@ -10,16 +10,16 @@
           &nbsp;&nbsp;最近访问
         </h2>
         <a :href="`/books/${book?.bookid}.html`">
-          <img class="rounded-t-lg" :src="`/covers/${book?.bookid?.padStart(5, '0')}.webp`"
+          <img class="rounded-t-lg" :src="`/covers/${book?.bookid}.webp`"
             :alt="`${book?.title}`" />
         </a>
         <br />
         <p class="mb-4 dark:text-gray-300">
-          最近访问的书籍是
+          最近访问的书籍是【{{ book?.region || '未知' }}】{{ book?.author }}{{ book?.translated && book?.copyrighter ? `（译者：${book.copyrighter}）` : '' }}的
           <a :href="`/books/${book?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
             《{{ book?.title }}》
           </a>
-          ，上次访问时间是{{ book?.lvt }}，访客来自{{book?.region}}。
+          ，上次访问时间是{{ book?.last_visited }}，访客来自{{ book?.visit_country }}。
         </p>
       </div>
       <a :href="`/books/${book?.bookid}.html`"

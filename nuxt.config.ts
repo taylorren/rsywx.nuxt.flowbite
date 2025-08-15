@@ -5,6 +5,13 @@ export default defineNuxtConfig({
     '~/assets/css/input.css',
   ],
 
+  // Disable automatic resource preloading to prevent warnings
+  app: {
+    head: {
+      link: []
+    }
+  },
+
   vite: {
     plugins: [
       tailwindcss(),

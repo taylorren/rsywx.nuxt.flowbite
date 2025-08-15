@@ -11,7 +11,14 @@
             </h2>
             <img class="rounded-t-lg" src="/images/reading_summary.png" alt="任氏有无轩" />
             <br />
-            <p class="dark:text-gray-300">任氏有无轩主人共读书{{ formatNumber(readingData?.hc) }}本，写了{{ formatNumber(readingData?.rc) }}篇读书笔记。</p><br />
+            <div class="space-y-3 dark:text-gray-300">
+              <p>任氏有无轩主人共读书<span class="font-semibold text-blue-600 dark:text-blue-400">{{ formatNumber(readingData?.books_read || 0) }}</span>本，写了<span class="font-semibold text-green-600 dark:text-green-400">{{ formatNumber(readingData?.reviews_written || 0) }}</span>篇读书笔记。</p>
+              
+              <div v-if="readingData?.reading_period" class="text-sm text-gray-600 dark:text-gray-400">
+                <p>阅读时间跨度：{{ formatReadingPeriod(readingData.reading_period) }}</p>
+                <p>总计：{{ readingData.reading_period.total_days }}天</p>
+              </div>
+            </div><br />
         </div>
         <a href="#"
             class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 self-start">
@@ -32,4 +39,20 @@ import { formatNumber } from '~/utils/helper';
 defineProps<{
     readingData: ReadingSummary | null | undefined;
 }>();
+
+// Format reading period dates
+const formatReadingPeriod = (period: { earliest_date: string; latest_date: string; total_days: number }) => {
+  if (!period.earliest_date || !period.latest_date) return '暂无数据';
+  
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('zh-CN', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+  
+  return `${formatDate(period.earliest_date)} 至 ${formatDate(period.latest_date)}`;
+};
 </script>

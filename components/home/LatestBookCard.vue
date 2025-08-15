@@ -10,12 +10,12 @@
         &nbsp;&nbsp;最新藏书
       </h2>
       <a :href="`/books/${latestBook?.bookid}.html`">
-        <img class="rounded-t-lg" :src="`/covers/${latestBook?.bookid?.padStart(5, '0')}.webp`"
+        <img class="rounded-t-lg" :src="`/covers/${latestBook?.bookid}.webp`"
           :alt="`${latestBook?.title}`" />
       </a>
       <br />
       <p class="mb-4 dark:text-gray-300">
-        最近的藏书是{{ latestBook?.author }}的
+        书籍是【{{ latestBook?.region || '未知' }}】{{ latestBook?.author }}{{ latestBook?.translated && latestBook?.copyrighter ? `（译者：${latestBook.copyrighter}）` : '' }}的
         <a :href="`/books/${latestBook?.bookid}.html`" class="font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
           《{{ latestBook?.title }}》
         </a>
@@ -35,9 +35,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Book } from '~/types/book';
+import type { LatestBook } from '~/types/book';
 
 defineProps<{
-  latestBook: Book | null | undefined;
+  latestBook: LatestBook | null | undefined;
 }>();
 </script>

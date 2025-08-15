@@ -179,7 +179,6 @@ async function loadVisitStats() {
   try {
     // 优先使用新的访问历史API
     visitHistoryData.value = await visitService.getVisitHistory(30);
-    // console.log('✅ Visit history data loaded:', visitHistoryData.value); // Commented out for production
   } catch (error) {
     console.error('Failed to fetch visit history, falling back to legacy API:', error);
     try {

@@ -24,7 +24,6 @@ class LoadTimeAnalyzer {
    */
   startAnalysis(): void {
     this.totalStartTime = performance.now();
-    console.log('🔍 Starting detailed load time breakdown analysis...');
   }
 
   /**
@@ -32,7 +31,6 @@ class LoadTimeAnalyzer {
    */
   startPhase(phase: string): void {
     this.phases.set(phase, { start: performance.now() });
-    console.log(`📍 Phase started: ${phase}`);
   }
 
   /**
@@ -43,7 +41,6 @@ class LoadTimeAnalyzer {
     if (phaseData) {
       phaseData.end = performance.now();
       const duration = phaseData.end - phaseData.start;
-      console.log(`✅ Phase completed: ${phase} (${duration.toFixed(2)}ms)`);
     }
   }
 
@@ -125,47 +122,27 @@ class LoadTimeAnalyzer {
     const breakdown = this.generateBreakdown();
     const totalTime = performance.now() - this.totalStartTime;
 
-    console.log('\n🔍 ===== DETAILED LOAD TIME BREAKDOWN =====');
-    console.log(`⏱️ Total Load Time: ${totalTime.toFixed(2)}ms (${(totalTime/1000).toFixed(2)}s)`);
-    console.log('');
 
-    console.log('📊 PHASE BREAKDOWN (sorted by duration):');
     breakdown.forEach((phase, index) => {
       const bar = '█'.repeat(Math.max(1, Math.floor(phase.percentage / 2)));
       const impact = phase.percentage > 30 ? '🚨' : phase.percentage > 15 ? '⚠️' : '💡';
       
-      console.log(`${index + 1}. ${impact} ${phase.phase}`);
-      console.log(`   Duration: ${phase.duration.toFixed(2)}ms (${phase.percentage.toFixed(1)}%)`);
-      console.log(`   ${bar} ${phase.percentage.toFixed(1)}%`);
-      console.log(`   📝 ${phase.description}`);
-      console.log(`   💡 ${phase.optimization}`);
-      console.log('');
     });
 
     // Identify the biggest bottlenecks
     const majorBottlenecks = breakdown.filter(phase => phase.percentage > 20);
     if (majorBottlenecks.length > 0) {
-      console.log('🚨 MAJOR BOTTLENECKS (>20% of total time):');
       majorBottlenecks.forEach(phase => {
-        console.log(`   - ${phase.phase}: ${phase.duration.toFixed(2)}ms (${phase.percentage.toFixed(1)}%)`);
-        console.log(`     💡 Priority fix: ${phase.optimization}`);
       });
-      console.log('');
     }
 
     // Performance recommendations
-    console.log('🎯 PERFORMANCE RECOMMENDATIONS:');
     if (totalTime > 5000) {
-      console.log('🚨 CRITICAL: Load time > 5s - Immediate action required');
     } else if (totalTime > 3000) {
-      console.log('⚠️ WARNING: Load time > 3s - Optimization recommended');
     } else if (totalTime > 1000) {
-      console.log('💡 INFO: Load time > 1s - Consider optimization');
     } else {
-      console.log('✅ GOOD: Load time < 1s - Performance is acceptable');
     }
 
-    console.log('\n===============================================\n');
   }
 
   /**

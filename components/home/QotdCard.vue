@@ -4,9 +4,13 @@
       <p class="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1">PHRASES WITH VALUE, INSIGHTS</p>
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-4xl font-bold dark:text-white">QOTD</h2>
-        <button @click="refreshQotd"
-          class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-          换一句
+        <button @click="refreshQotd" :disabled="isLoading"
+          class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:opacity-50 disabled:cursor-not-allowed">
+          <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isLoading ? '加载中...' : '换一句' }}
         </button>
       </div>
       <div class="flex flex-col md:flex-row rounded-lg overflow-hidden">
@@ -22,12 +26,26 @@
         </div>
         <!-- 右侧内容区域 -->
         <div class="md:w-1/2 p-6 flex flex-col justify-center bg-black text-white">
-          <blockquote class="mb-4">
-            <p class="mb-4 text-xl font-medium" x-text="qotd.quote">
-              {{ qotd?.quote || '加载中...' }}
+          <!-- Loading state -->
+          <div v-if="isLoading" class="flex items-center justify-center h-32">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
+          
+          <!-- Error state -->
+          <div v-else-if="error" class="text-center text-red-400">
+            <p class="mb-2">加载失败</p>
+            <button @click="refreshQotd" class="text-sm underline hover:no-underline">
+              重试
+            </button>
+          </div>
+          
+          <!-- Content -->
+          <blockquote v-else class="mb-4">
+            <p class="mb-4 text-xl font-medium">
+              {{ qotd?.quote || '暂无内容' }}
             </p>
             <footer class="text-sm text-gray-400">
-              <span class="block text-right" x-text="qotd.source">— {{ qotd?.source || '' }}</span>
+              <span class="block text-right">— {{ qotd?.source || '' }}</span>
             </footer>
           </blockquote>
         </div>
@@ -41,7 +59,7 @@ import { onMounted } from 'vue';
 import { useQotd } from '~/composables/useQotd';
 
 // 使用组合式API获取每日一句功能
-const { qotd, error, refreshQotd, fetchQotd } = useQotd();
+const { qotd, error, isLoading, refreshQotd, fetchQotd } = useQotd();
 
 onMounted(() => {
   fetchQotd();

@@ -63,7 +63,7 @@ export class MiscService {
     const config = useRuntimeConfig();
     const apiBase = config.public.apiBase || '/api';
      const apiKey = (config.public.apiKey as string) || 'your-api-key';
-     const apiUrl = `${apiBase}/qotd`;
+     const apiUrl = `${apiBase}/misc/qotd`;
     
     try {
       const response = await this.$fetch<{success: boolean, data: Qotd}>(apiUrl, {
