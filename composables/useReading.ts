@@ -39,7 +39,6 @@ export function useReading() {
     if (latestReadingLoaded.value) return;
     
     try {
-      
       latestReading.value = await readingService.getLatestReading(count);
       latestReadingLoaded.value = true;
       await nextTick(); // 等待DOM更新

@@ -38,8 +38,8 @@ export class ReadingService {
   async getLatestReading(count: number = 1): Promise<LatestReading[]> {
     const config = useRuntimeConfig();
     const apiBase = config.public.apiBase || '/api';
-     const apiKey = (config.public.apiKey as string) || 'your-api-key';
-     const apiUrl = `${apiBase}/readings/latest/${count}`;
+    const apiKey = (config.public.apiKey as string) || 'your-api-key';
+    const apiUrl = `${apiBase}/readings/latest/${count}`;
 
     try {
       const response = await this.$fetch<{success: boolean, data: LatestReading[]}>(apiUrl, {
@@ -47,6 +47,7 @@ export class ReadingService {
           'X-API-Key': apiKey
         }
       });
+      
       return response.data || [];
     } catch (error: any) {
       console.error('Failed to fetch latest reading:', error);

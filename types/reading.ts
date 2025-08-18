@@ -14,15 +14,13 @@ export interface LegacyReadingSummary {
   rc: number;
 }
 export interface LatestReading {
-  hid: number;
-  bid: number;
+  title: string;           // This is the review title
+  datein: string;
+  uri: string;
+  feature: string;
   bookid: string;
-  title: string;
-  author: string;
-  reviewtitle: string;
-  create_at: string;
+  book_title: string;      // This is the book title
   cover_uri: string;
-  reviews_count: number;
 }
 
 // Legacy interface for backward compatibility

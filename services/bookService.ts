@@ -93,7 +93,7 @@ export class BookService {
     }
 
     async getLatestBook(): Promise<LatestBook> {
-        return await timedWithCategory('API: Latest Book', 'api', async (): Promise<Book> => {
+        return await timedWithCategory('API: Latest Book', 'api', async (): Promise<LatestBook> => {
             const config = useRuntimeConfig();
             const apiBase = config.public.apiBase || '/api';
             const apiKey = (config.public.apiKey as string) || 'your-api-key';
@@ -133,7 +133,7 @@ export class BookService {
                     location: '',
                     purchdate: '',
                     price: 0
-                };
+                } as LatestBook;
             } catch (error: any) {
                 console.error('Failed to fetch latest book:', error);
                 throw error;
@@ -253,7 +253,7 @@ export class BookService {
             const apiUrl = apiBase + "/books/today";
 
             try {
-                const response = await this.$fetch<{success: boolean, data: any[], cached: boolean, date_info: any}>(apiUrl, {
+                const response = await this.$fetch<{ success: boolean, data: any[], cached: boolean, date_info: any }>(apiUrl, {
                     headers: {
                         'X-API-Key': apiKey
                     }
@@ -409,7 +409,19 @@ export class BookService {
 
             const latestBook = results[1].status === 'fulfilled'
                 ? results[1].value
-                : defaultBook;
+                : {
+                    id: 0,
+                    bookid: '',
+                    title: '',
+                    author: '',
+                    cover_uri: '',
+                    translated: 0,
+                    copyrighter: '',
+                    region: '',
+                    location: '',
+                    purchdate: '',
+                    price: 0
+                } as LatestBook;
 
             const randomBooks = results[2].status === 'fulfilled'
                 ? results[2].value
@@ -450,7 +462,19 @@ export class BookService {
             // Return default values on error
             return {
                 summary: { bc: 0, pc: '0', wc: '0', vc: 0 },
-                latestBook: defaultBook,
+                latestBook: {
+                    id: 0,
+                    bookid: '',
+                    title: '',
+                    author: '',
+                    cover_uri: '',
+                    translated: 0,
+                    copyrighter: '',
+                    region: '',
+                    location: '',
+                    purchdate: '',
+                    price: 0
+                } as LatestBook,
                 randomBooks: defaultRandomBook,
                 recentBooks: [],
                 forgetBooks: [],
