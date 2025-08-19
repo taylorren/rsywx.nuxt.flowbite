@@ -13,45 +13,77 @@
       <div class="flex flex-col md:flex-row gap-8">
         <!-- 左侧书籍信息 -->
         <div class="w-full md:w-2/3">
-          <h1 class="text-3xl font-bold mb-4 dark:text-white">{{ bookData.book.title }}</h1>
+          <h1 class="text-3xl font-bold mb-4 dark:text-white">{{ bookData.title }}</h1>
           
           <div class="mb-6">
             <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
               <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                   <tr class="bg-white dark:bg-gray-800">
-                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">作者</td>
-                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.author }}</td>
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">
+                      <span v-if="bookData.translated && bookData.copyrighter">作者 | 译者</span>
+                      <span v-else>作者</span>
+                    </td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
+                      <span class="inline-flex items-center gap-2">
+                        <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded text-xs">
+                          {{ bookData.region }}
+                        </span>
+                        <span v-if="bookData.translated && bookData.copyrighter">
+                          {{ bookData.author }} | {{ bookData.copyrighter }}
+                        </span>
+                        <span v-else>
+                          {{ bookData.author }}
+                        </span>
+                      </span>
+                    </td>
                   </tr>
                   <tr class="bg-gray-50 dark:bg-gray-700">
                     <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">分类</td>
-                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.category }}</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
+                      <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded text-xs">
+                        {{ bookData.category }}
+                      </span>
+                    </td>
                   </tr>
-                  <tr class="bg-white dark:bg-gray-800">
+                  <tr class="bg-gray-50 dark:bg-gray-700">
                     <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">出版社</td>
-                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.pu_name }}</td>
-                  </tr>
-                  <tr class="bg-gray-50 dark:bg-gray-700">
-                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">出版地</td>
-                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.pu_place }}</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.publisher_name }}</td>
                   </tr>
                   <tr class="bg-white dark:bg-gray-800">
-                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">出版日期</td>
-                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.pubdate }}</td>
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">出版地</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
+                      <span class="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded text-xs">
+                        {{ bookData.place_name }}
+                      </span>
+                    </td>
                   </tr>
                   <tr class="bg-gray-50 dark:bg-gray-700">
-                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">ISBN</td>
-                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.isbn }}</td>
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">出版日期</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.pubdate }}</td>
                   </tr>
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">ISBN</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.isbn }}</td>
+                  </tr>
+                  <tr class="bg-gray-50 dark:bg-gray-700">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">页数</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.page }}</td>
+                  </tr>
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">千字数</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.kword }}</td>
+                  </tr>
+
                 </tbody>
               </table>
             </div>
           </div>
           
           <!-- 标签 -->
-          <div class="mb-6" v-if="bookData.tags && bookData.tags.length > 0">
+          <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2 dark:text-white">标签</h2>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2 mb-2">
               <span 
                 v-for="(tag, index) in bookData.tags" 
                 :key="index"
@@ -60,32 +92,40 @@
                 {{ tag }}
               </span>
               <button 
-                @click="showTagModal = true" 
+                v-if="!showTagInput"
+                @click="showTagInput = true" 
                 class="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold"
                 title="添加标签"
               >
                 +
               </button>
             </div>
-            <!-- 成功消息 -->
-            <div v-if="showSuccessMessage" class="mt-2 bg-green-100 border-l-4 border-green-500 text-green-700 p-2 rounded animate-fade-in-out dark:bg-green-900 dark:text-green-200">
-              标签已成功添加
-            </div>
-          </div>
-          
-          <!-- 如果没有标签，仍然显示添加标签按钮 -->
-          <div class="mb-6" v-else>
-            <h2 class="text-xl font-semibold mb-2 dark:text-white">标签</h2>
-            <div class="flex flex-wrap gap-2">
-              <p class="text-gray-500 dark:text-gray-400 text-sm mr-2 flex items-center">暂无标签</p>
+            
+            <!-- 内联标签输入 -->
+            <div v-if="showTagInput" class="flex gap-2 items-center">
+              <input 
+                v-model="tagsInput"
+                @keyup.enter="submitTags"
+                @keyup.escape="cancelTagInput"
+                ref="tagInputRef"
+                class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="输入标签，用空格分隔，按回车确认"
+                autofocus
+              />
               <button 
-                @click="showTagModal = true" 
-                class="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold"
-                title="添加标签"
+                @click="submitTags"
+                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
               >
-                +
+                添加
+              </button>
+              <button 
+                @click="cancelTagInput"
+                class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm"
+              >
+                取消
               </button>
             </div>
+            
             <!-- 成功消息 -->
             <div v-if="showSuccessMessage" class="mt-2 bg-green-100 border-l-4 border-green-500 text-green-700 p-2 rounded animate-fade-in-out dark:bg-green-900 dark:text-green-200">
               标签已成功添加
@@ -93,161 +133,127 @@
           </div>
           
           <!-- 简介 -->
-          <div class="mb-6" v-if="bookData.book.intro">
+          <div class="mb-6" v-if="bookData.intro">
             <h2 class="text-xl font-semibold mb-2 dark:text-white">简介</h2>
             <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded">
-              <p class="whitespace-pre-line dark:text-gray-200">{{ bookData.book.intro }}</p>
+              <p class="whitespace-pre-line dark:text-gray-200">{{ bookData.intro }}</p>
             </div>
           </div>
-          
+
           <!-- 评论 -->
-          <div v-if="bookData.book.reviews && bookData.book.reviews.length > 0">
-            <h2 class="text-xl font-semibold mb-2 dark:text-white">评论</h2>
-            <div class="space-y-4">
+          <div v-if="bookData.reviews && bookData.reviews.length > 0">
+            <h2 class="text-xl font-semibold mb-4 dark:text-white">相关评论</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div 
-                v-for="(review, index) in bookData.book.reviews" 
+                v-for="(review, index) in bookData.reviews" 
                 :key="index"
-                class="bg-gray-50 dark:bg-gray-800 p-4 rounded flex gap-4"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div class="flex-shrink-0 w-24 h-24">
+                <!-- Feature image at top -->
+                <div class="aspect-video w-full">
                   <img 
-                    :src="review.bt || 'https://rsywx.net/assets/img/default.jpg'"
-                    alt="评论配图" 
-                    class="w-full h-full object-cover rounded"
+                    :src="review.feature || '/covers/' + bookData.bookid + '.webp'"
+                    :alt="review.title" 
+                    class="w-full h-full object-cover"
                   />
                 </div>
-                <div class="flex-grow">
-                  <p class="whitespace-pre-line dark:text-gray-200">{{ review.rt }}</p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">创作于{{ review.datein }}</p>
+                
+                <!-- Review content -->
+                <div class="p-4">
                   <a 
-                    v-if="review.uri" 
                     :href="review.uri" 
                     target="_blank" 
-                    class="text-blue-500 hover:underline text-sm dark:text-blue-400"
+                    class="font-semibold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2 block mb-2"
                   >
-                    查看原文
+                    {{ review.title }}
                   </a>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ review.datein }}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <!-- 右侧收藏信息 -->
-        <div class="w-full md:w-1/3 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg h-fit">
+        <!-- 右侧书籍封面和统计信息 -->
+        <div class="w-full md:w-1/3">
           <!-- 书籍封面 -->
-          <div class="mb-6 flex justify-center">
-            <img 
-              :src="`https://api.rsywx.com/covers/${bookid}.jpg`" 
-              :alt="bookData.book.title + ' 封面'" 
-              class="max-w-full h-auto rounded shadow-md border border-gray-200 dark:border-gray-700"
-              @error="handleImageError"
-              v-if="showCover"
-            />
-            <div 
-              v-else 
-              class="w-full aspect-[2/3] bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center text-gray-500 dark:text-gray-400"
-            >
-              <span>暂无封面</span>
+          <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-6">
+            <div class="flex justify-center">
+              <img 
+                :src="`/covers/${bookid}.webp`" 
+                :alt="bookData.title + ' 封面'" 
+                class="max-w-full h-auto rounded shadow-md border border-gray-200 dark:border-gray-700"
+                @error="handleImageError"
+                v-if="showCover"
+              />
+              <div 
+                v-else 
+                class="w-full aspect-[2/3] bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center text-gray-500 dark:text-gray-400"
+              >
+                <span>暂无封面</span>
+              </div>
             </div>
           </div>
           
-          <h2 class="text-xl font-semibold mb-4 dark:text-white">收藏信息</h2>
-          <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <tr class="bg-white dark:bg-gray-800">
-                  <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/3">购买日期</td>
-                  <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.purchdate }}</td>
-                </tr>
-                <tr class="bg-gray-50 dark:bg-gray-700">
-                  <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/3">价格</td>
-                  <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.price }}</td>
-                </tr>
-                <tr class="bg-white dark:bg-gray-800">
-                  <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/3">位置</td>
-                  <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.location }}</td>
-                </tr>
-                <tr class="bg-gray-50 dark:bg-gray-700">
-                  <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/3">访问次数</td>
-                  <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ formatNumber(bookData.book.vc) }}</td>
-                </tr>
-                <tr class="bg-white dark:bg-gray-800">
-                  <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/3">最后访问</td>
-                  <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.book.lvt }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- 收藏信息 -->
+          <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-4 dark:text-white">收藏信息</h2>
+            <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">购买日期</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.purchdate }}</td>
+                  </tr>
+                  <tr class="bg-gray-50 dark:bg-gray-700">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">价格</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
+                      <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded text-xs font-medium">
+                        ¥{{ bookData.price }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">存放位置</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
+                      <span class="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 px-2 py-1 rounded text-xs">
+                        {{ bookData.location }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="bg-gray-50 dark:bg-gray-700">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">访问次数</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ formatNumber(bookData.total_visits) }}</td>
+                  </tr>
+                  <tr class="bg-white dark:bg-gray-800">
+                    <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">最后访问</td>
+                    <td class="py-2 px-4 text-gray-900 dark:text-gray-200">{{ bookData.last_visited || '从未访问' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- 添加标签模态框 -->
-  <Teleport to="body">
-    <div v-if="showTagModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="modal-dialog max-w-md w-full mx-4"> 
-        <div class="modal-content border-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl"> 
-          <div class="position-relative border-0 pe-4 p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700"> 
-            <h3 class="text-lg font-semibold dark:text-white">标记感兴趣的书</h3>
-            <button type="button" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300" @click="showTagModal = false" aria-label="Close"> 
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button> 
-          </div> 
-          <div class="p-5"> 
-            <p class="mb-4 text-gray-600 dark:text-gray-400">增加自己的TAG</p>
-            <form @submit.prevent="submitTags" class="space-y-4"> 
-              <div class="relative"> 
-                <div class="flex items-center border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden"> 
-                  <span class="pl-3 text-gray-500 dark:text-gray-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
-                    </svg>
-                  </span> 
-                  <input 
-                    v-model="tagsInput" 
-                    class="w-full px-3 py-2 outline-none bg-transparent dark:text-white" 
-                    autofocus 
-                    placeholder="（用空格分割）" 
-                    name="tags" 
-                    id="tags"
-                  > 
-                </div> 
-              </div> 
-              <input type="hidden" name="id" :value="bookData?.book.id"/> 
-              <input type="hidden" name="bookid" :value="bookData?.book.bookid"/> 
-              <div> 
-                <button 
-                  class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-md transition duration-200" 
-                  type="submit"
-                > 
-                  添加 
-                </button> 
-              </div> 
-            </form> 
-          </div> 
-        </div> 
-      </div> 
-    </div>
-  </Teleport>
+
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAsyncData } from 'nuxt/app';
-import { BookService } from '~/services/bookService';
 import { formatNumber } from '~/utils/helper';
-import type { Book, BookTags } from '~/types/book';
 
 const route = useRoute();
 const bookid = route.params.bookid;
 const loading = ref(true);
 const error = ref<Error | null>(null);
-const bookData = ref<{ book: Book; tags: BookTags } | null>(null);
+const bookData = ref<any>(null);
 const showCover = ref(true);
 
 // 处理图片加载错误
@@ -255,14 +261,23 @@ const handleImageError = () => {
   showCover.value = false;
 };
 
-// 创建BookService实例
-const bookService = new BookService($fetch);
 
-// 获取书籍详情和标签
+
+// 获取书籍详情
 try {
   const { data, error: asyncError } = await useAsyncData(`book-${bookid}`, async () => {
-    // 确保 bookid 是字符串类型
-    return await bookService.getBookByBookid(String(bookid));
+    // 直接调用 API 端点
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api/v1';
+    const apiKey = config.public.apiKey as string;
+    
+    const response = await $fetch(`${apiBase}/books/${bookid}`, {
+      headers: {
+        'X-API-Key': apiKey
+      }
+    });
+    
+    return response.data;
   });
   
   if (asyncError.value) {
@@ -276,9 +291,10 @@ try {
   loading.value = false;
 }
 
-const showTagModal = ref(false);
+const showTagInput = ref(false);
 const tagsInput = ref('');
 const showSuccessMessage = ref(false);
+const tagInputRef = ref<HTMLInputElement>();
 
 // 显示成功消息的函数
 const showSuccess = () => {
@@ -294,67 +310,69 @@ const submitTags = async () => {
     return;
   }
   
-  // 先清空输入并关闭模态框，让用户立即看到反馈
-  const inputTags = tagsInput.value;
-  tagsInput.value = '';
-  showTagModal.value = false;
-  
-  // 显示成功消息
-  showSuccess();
+  // 解析标签（用空格分割）
+  const inputTags = tagsInput.value.trim().split(/\s+/).filter(tag => tag.length > 0);
   
   try {
-    // 创建表单数据
-    const formData = new FormData();
-    formData.append('tags', inputTags);
-    formData.append('id', bookData.value.book.id.toString());
-    formData.append('bookid', bookData.value.book.bookid);
+    // 使用新的 API 端点
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api/v1';
+    const apiKey = config.public.apiKey as string;
     
-    // 发送POST请求
-    const response = await fetch('https://rsywx.net/books/add_tags', {
+    const response = await $fetch(`${apiBase}/books/${bookData.value.bookid}/tags`, {
       method: 'POST',
-      body: formData,
-      mode: 'cors',
-      credentials: 'include',
       headers: {
-        'Accept': 'application/json',
+        'X-API-Key': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: {
+        tags: inputTags
       }
     });
     
-    if (response.ok) {
-      // 然后在后台刷新标签数据
-      const { data } = await useAsyncData(`book-tags-${bookid}`, async () => {
-        return await bookService.getTagsByBookid(String(bookid));
-      }, { server: false });
+    if (response.success) {
+      // 清空输入并隐藏输入框
+      tagsInput.value = '';
+      showTagInput.value = false;
       
-      if (data.value && bookData.value) {
-        bookData.value.tags = data.value;
-      }
-    } else {
-      console.error('Failed to add tags');
-      // 即使请求失败，也尝试刷新标签数据
-      refreshTagData();
+      // 显示成功消息
+      showSuccess();
+      
+      // 刷新书籍数据以获取更新的标签
+      await refreshBookData();
     }
   } catch (error) {
     console.error('Error adding tags:', error);
-    // 即使出现错误，也尝试刷新标签数据
-    refreshTagData();
   }
 };
 
-// 刷新标签数据的函数
-const refreshTagData = async () => {
+// 取消标签输入
+const cancelTagInput = () => {
+  tagsInput.value = '';
+  showTagInput.value = false;
+};
+
+// 刷新书籍数据的函数
+const refreshBookData = async () => {
   if (!bookData.value) return;
   
   try {
-    const { data } = await useAsyncData(`book-tags-${bookid}`, async () => {
-      return await bookService.getTagsByBookid(String(bookid));
-    }, { server: false });
+    // 重新获取完整的书籍数据，使用 refresh=true 强制刷新缓存
+    const config = useRuntimeConfig();
+    const apiBase = config.public.apiBase || '/api/v1';
+    const apiKey = config.public.apiKey as string;
     
-    if (data.value && bookData.value) {
-      bookData.value.tags = data.value;
+    const response = await $fetch(`${apiBase}/books/${bookid}?refresh=true`, {
+      headers: {
+        'X-API-Key': apiKey
+      }
+    });
+    
+    if (response.success) {
+      bookData.value = response.data;
     }
   } catch (err) {
-    console.error('Error refreshing tag data:', err);
+    console.error('Error refreshing book data:', err);
   }
 };
 </script>
