@@ -4,6 +4,13 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/input.css',
   ],
+  
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://api.rsywx/api/v1',
+      apiKey: process.env.NUXT_API_KEY || 'your-api-key'
+    }
+  },
 
   // Disable automatic resource preloading to prevent warnings
   app: {

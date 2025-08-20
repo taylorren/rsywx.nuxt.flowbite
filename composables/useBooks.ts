@@ -31,9 +31,9 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   const forgetBookError = ref<Error | null>(null);
   const forgetBookLoaded = ref(false);
 
-  const todayBooks = ref<TodayBook[] | null>(null);
-  const todayBooksError = ref<Error | null>(null);
-  const todayBooksLoaded = ref(false);
+  const todayBook = ref<TodayBook[] | null>(null);
+  const todayBookError = ref<Error | null>(null);
+  const todayBookLoaded = ref(false);
 
   // 加载关键数据
   const loadSummary = async () => {
@@ -71,9 +71,9 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
   };
 
   // 刷新随机书籍的方法
-  const refreshRandomBook = async () => {
+  const refreshRandomBook = async (count: number = 4) => {
     try {
-      randomBook.value = await bookService.getRandomBooks(4, true); // Get 4 random books with refresh
+      randomBook.value = await bookService.getRandomBooks(count, true); // Get random books with refresh
     } catch (error) {
       randomBookError.value = error as Error;
       console.error('❌ Failed to refresh random books:', error);
@@ -110,17 +110,17 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
     }
   };
 
-  const loadTodayBooks = async () => {
-    if (todayBooksLoaded.value) {
+  const loadTodayBook = async () => {
+    if (todayBookLoaded.value) {
       return;
     }
 
     try {
-      todayBooks.value = await bookService.getTodayBooks();
-      todayBooksLoaded.value = true;
+      todayBook.value = await bookService.getTodayBooks();
+      todayBookLoaded.value = true;
       await nextTick(); // 等待DOM更新
     } catch (error) {
-      todayBooksError.value = error as Error;
+      todayBookError.value = error as Error;
       console.error('❌ Failed to fetch today books:', error);
     }
   };
@@ -133,15 +133,13 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
     ]);
   };
 
-  // 重置加载状态标志
+    // 重置加载状态标志
   const resetLoadedFlags = () => {
     randomBookLoaded.value = false;
     recentVisitBookLoaded.value = false;
     forgetBookLoaded.value = false;
-    todayBooksLoaded.value = false;
-  };
-
-  // 批量加载所有非关键数据
+    todayBookLoaded.value = false;
+  };  // 批量加载所有非关键数据
   const loadAllNonCriticalData = async () => {
     const startTime = performance.now();
 
@@ -150,7 +148,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
         loadRandomBook(),
         loadRecentVisitBook(),
         loadForgetBook(),
-        loadTodayBooks()
+        loadTodayBook()
       ]);
 
       // Log individual results for debugging
@@ -180,13 +178,13 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
       randomBook.value = batchData.randomBooks;
       recentVisitBook.value = batchData.recentBooks;
       forgetBook.value = batchData.forgetBooks;
-      todayBooks.value = batchData.todayBooks;
+      todayBook.value = batchData.todayBooks;
 
       // 标记所有数据为已加载
       randomBookLoaded.value = true;
       recentVisitBookLoaded.value = true;
       forgetBookLoaded.value = true;
-      todayBooksLoaded.value = true;
+      todayBookLoaded.value = true;
 
     } catch (error) {
       console.error('❌ Optimized batch loading failed:', error);
@@ -212,9 +210,9 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
     forgetBook,
     forgetBookError,
     forgetBookLoaded,
-    todayBooks,
-    todayBooksError,
-    todayBooksLoaded,
+    todayBook,
+    todayBookError,
+    todayBookLoaded,
 
     // 方法
     loadSummary,
@@ -223,7 +221,7 @@ export function useBooks($fetch: typeof globalThis.$fetch = globalThis.$fetch) {
     refreshRandomBook,
     loadRecentVisitBook,
     loadForgetBook,
-    loadTodayBooks,
+    loadTodayBook,
     resetLoadedFlags,
     initializeKeyData,
     loadAllNonCriticalData,
