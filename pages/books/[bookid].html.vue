@@ -147,7 +147,7 @@
           </div>
 
           <!-- 评论 -->
-          <div v-if="bookData.reviews && bookData.reviews.length > 0">
+          <div v-if="bookData.reviews && bookData.reviews.length > 0" class="mb-8">
             <h2 class="text-xl font-semibold mb-4 dark:text-white">相关评论</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div 
@@ -176,6 +176,86 @@
                   <p class="text-sm text-gray-500 dark:text-gray-400">
                     {{ review.datein }}
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 相关书籍 -->
+          <div v-if="relatedBooks.length > 0 || relatedLoading">
+            <h2 class="text-xl font-semibold mb-4 dark:text-white">相关书籍</h2>
+            
+            <!-- Loading state -->
+            <div v-if="relatedLoading" class="flex justify-center items-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+            
+            <!-- Error state -->
+            <div v-else-if="relatedError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {{ relatedError }}
+            </div>
+            
+            <!-- Related books grid -->
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <div 
+                v-for="(item, index) in relatedBooks" 
+                :key="index"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                @click="navigateToBook(item.book.bookid)"
+              >
+                <!-- Book cover -->
+                <div class="aspect-[2/3] w-full">
+                  <img 
+                    :src="`/covers/${item.book.bookid}.webp`"
+                    :alt="item.book.title + ' 封面'" 
+                    class="w-full h-full object-cover"
+                    @error="(e) => { (e.target as HTMLImageElement).src = '/covers/placeholder.webp' }"
+                  />
+                </div>
+                
+                <!-- Book info -->
+                <div class="p-3">
+                  <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1">
+                    {{ item.book.title }}
+                  </h3>
+                  <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    {{ item.book.author }}
+                  </p>
+                  
+                  <!-- Total score with dynamic coloring -->
+                  <div class="flex items-center justify-between mb-2">
+                    <span 
+                      class="text-xs px-2 py-1 rounded font-medium"
+                      :class="getScoreColorClass(item)"
+                    >
+                      {{ Math.round(item.total_score * 100) }}%
+                    </span>
+                    <span 
+                      v-if="item.category" 
+                      class="text-xs px-2 py-1 rounded"
+                      :class="{
+                        'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100': item.category === 'serendipity',
+                        'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100': item.category === 'similar',
+                        'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100': item.category === 'discovery',
+                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100': !['serendipity', 'similar', 'discovery'].includes(item.category)
+                      }"
+                    >
+                      {{ getCategoryLabel(item.category) }}
+                    </span>
+                  </div>
+                  
+                  <!-- Relationship reasons -->
+                  <div v-if="item.relationship_reasons && item.relationship_reasons.length > 0" class="mt-2">
+                    <div class="flex flex-wrap gap-1">
+                      <span 
+                        v-for="(reason, reasonIndex) in item.relationship_reasons.slice(0, 2)" 
+                        :key="reasonIndex"
+                        class="text-xs bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded"
+                      >
+                        {{ reason }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -262,6 +342,11 @@ const error = ref<Error | null>(null);
 const bookData = ref<any>(null);
 const showCover = ref(true);
 
+// Related books state
+const relatedBooks = ref<any[]>([]);
+const relatedLoading = ref(false);
+const relatedError = ref<string | null>(null);
+
 // 处理图片加载错误
 const handleImageError = () => {
   showCover.value = false;
@@ -279,6 +364,8 @@ const fetchBookData = async () => {
     
     if (response.success) {
       bookData.value = response.data;
+      // Fetch related books after getting book data
+      fetchRelatedBooks();
     } else {
       error.value = new Error('Failed to load book details');
     }
@@ -286,6 +373,33 @@ const fetchBookData = async () => {
     error.value = e instanceof Error ? e : new Error(String(e));
   } finally {
     loading.value = false;
+  }
+};
+
+// 获取相关书籍
+const fetchRelatedBooks = async () => {
+  if (!bookid) return;
+  
+  relatedLoading.value = true;
+  relatedError.value = null;
+  
+  try {
+    const config = useRuntimeConfig();
+    const response: any = await $fetch(`${config.public.apiBase}/books/${bookid}/related/5`, {
+      headers: {
+        'X-API-Key': config.public.apiKey
+      }
+    });
+    
+    if (response.success) {
+      relatedBooks.value = response.data;
+    } else {
+      relatedError.value = 'Failed to load related books';
+    }
+  } catch (e) {
+    relatedError.value = e instanceof Error ? e.message : 'Failed to load related books';
+  } finally {
+    relatedLoading.value = false;
   }
 };
 
@@ -304,6 +418,10 @@ watch(() => route.params.bookid, (newBookId, oldBookId) => {
     showTagInput.value = false;
     tagsInput.value = '';
     showSuccessMessage.value = false;
+    // Reset related books state
+    relatedBooks.value = [];
+    relatedLoading.value = false;
+    relatedError.value = null;
     // Fetch new data
     fetchBookData();
   }
@@ -401,6 +519,44 @@ const navigateToTag = (tag: string) => {
 const navigateToAuthor = (author: string) => {
   router.push(`/books/list/author/${encodeURIComponent(author)}`);
 };
+
+const navigateToBook = (bookid: string) => {
+  router.push(`/books/${bookid}.html`);
+};
+
+// Get category label for display
+const getCategoryLabel = (category: string) => {
+  const labels: Record<string, string> = {
+    'serendipity': '意外发现',
+    'similar': '相似推荐',
+    'discovery': '探索发现',
+    'author': '同作者',
+    'tag': '同标签',
+    'category': '同分类'
+  };
+  return labels[category] || category;
+};
+
+// Get dynamic color class based on dominant score type
+const getScoreColorClass = (item: any) => {
+  const similarityScore = item.similarity_score || 0;
+  const discoveryScore = item.discovery_score || 0;
+  
+  // If similarity score is significantly higher (more than 1.5x discovery score)
+  // Use bold, traditional colors to show strong connection
+  if (similarityScore > discoveryScore * 1.5) {
+    return 'bg-blue-600 text-white dark:bg-blue-500 dark:text-white';
+  }
+  
+  // If discovery score is significantly higher (more than 1.5x similarity score)
+  // Use bright, encouraging colors to promote exploration
+  if (discoveryScore > similarityScore * 1.5) {
+    return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white dark:from-yellow-500 dark:to-orange-600 dark:text-white';
+  }
+  
+  // If scores are balanced, use a neutral but positive color
+  return 'bg-green-500 text-white dark:bg-green-600 dark:text-white';
+};
 </script>
 
 <style>
@@ -414,5 +570,13 @@ const navigateToAuthor = (author: string) => {
 
 .animate-fade-in-out {
   animation: fadeInOut 3s ease-in-out;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
