@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto px-4 py-8" :key="route.params.bookid">
     <div v-if="loading" class="flex justify-center items-center h-64">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
@@ -26,14 +26,19 @@
                     </td>
                     <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
                       <span class="inline-flex items-center gap-2">
-                        <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded text-xs">
+                        <span class="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded text-xs">
                           {{ bookData.region }}
                         </span>
                         <span v-if="bookData.translated && bookData.copyrighter">
-                          {{ bookData.author }} | {{ bookData.copyrighter }}
+                          <button @click="navigateToAuthor(bookData.author)" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
+                            {{ bookData.author }}
+                          </button>
+                          | {{ bookData.copyrighter }}
                         </span>
                         <span v-else>
-                          {{ bookData.author }}
+                          <button @click="navigateToAuthor(bookData.author)" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
+                            {{ bookData.author }}
+                          </button>
                         </span>
                       </span>
                     </td>
@@ -41,8 +46,8 @@
                   <tr class="bg-gray-50 dark:bg-gray-700">
                     <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">分类</td>
                     <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
-                      <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded text-xs">
-                        {{ bookData.category }}
+                      <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded text-xs">
+                        {{ bookData.category || '-' }}
                       </span>
                     </td>
                   </tr>
@@ -53,7 +58,7 @@
                   <tr class="bg-white dark:bg-gray-800">
                     <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/4">出版地</td>
                     <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
-                      <span class="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded text-xs">
+                      <span class="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 px-2 py-1 rounded text-xs">
                         {{ bookData.place_name }}
                       </span>
                     </td>
@@ -84,13 +89,14 @@
           <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2 dark:text-white">标签</h2>
             <div class="flex flex-wrap gap-2 mb-2">
-              <span 
+              <button 
                 v-for="(tag, index) in bookData.tags" 
                 :key="index"
-                class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
+                @click="navigateToTag(tag)"
+                class="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 px-3 py-1 rounded-full text-sm hover:bg-green-200 dark:hover:bg-green-700 transition-colors cursor-pointer"
               >
                 {{ tag }}
-              </span>
+              </button>
               <button 
                 v-if="!showTagInput"
                 @click="showTagInput = true" 
@@ -210,7 +216,7 @@
                   <tr class="bg-gray-50 dark:bg-gray-700">
                     <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">价格</td>
                     <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
-                      <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded text-xs font-medium">
+                      <span class="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 px-2 py-1 rounded text-xs font-medium">
                         ¥{{ bookData.price }}
                       </span>
                     </td>
@@ -218,7 +224,7 @@
                   <tr class="bg-white dark:bg-gray-800">
                     <td class="py-2 px-4 font-semibold text-gray-700 dark:text-gray-300 w-1/2">存放位置</td>
                     <td class="py-2 px-4 text-gray-900 dark:text-gray-200">
-                      <span class="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 px-2 py-1 rounded text-xs">
+                      <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded text-xs">
                         {{ bookData.location }}
                       </span>
                     </td>
@@ -244,12 +250,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useAsyncData } from 'nuxt/app';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { formatNumber } from '~/utils/helper';
 
 const route = useRoute();
+const router = useRouter();
 const bookid = route.params.bookid;
 const loading = ref(true);
 const error = ref<Error | null>(null);
@@ -261,35 +267,47 @@ const handleImageError = () => {
   showCover.value = false;
 };
 
-
-
 // 获取书籍详情
-try {
-  const { data, error: asyncError } = await useAsyncData(`book-${bookid}`, async () => {
-    // 直接调用 API 端点
+const fetchBookData = async () => {
+  try {
     const config = useRuntimeConfig();
-    const apiBase = config.public.apiBase || '/api/v1';
-    const apiKey = config.public.apiKey as string;
-    
-    const response = await $fetch(`${apiBase}/books/${bookid}`, {
+    const response: any = await $fetch(`${config.public.apiBase}/books/${bookid}`, {
       headers: {
-        'X-API-Key': apiKey
+        'X-API-Key': config.public.apiKey
       }
     });
     
-    return response.data;
-  });
-  
-  if (asyncError.value) {
-    error.value = asyncError.value;
-  } else {
-    bookData.value = data.value;
+    if (response.success) {
+      bookData.value = response.data;
+    } else {
+      error.value = new Error('Failed to load book details');
+    }
+  } catch (e) {
+    error.value = e instanceof Error ? e : new Error(String(e));
+  } finally {
+    loading.value = false;
   }
-} catch (e) {
-  error.value = e instanceof Error ? e : new Error(String(e));
-} finally {
-  loading.value = false;
-}
+};
+
+onMounted(() => {
+  fetchBookData();
+});
+
+// Watch for route changes to handle browser back navigation
+watch(() => route.params.bookid, (newBookId, oldBookId) => {
+  if (newBookId && newBookId !== oldBookId) {
+    // Reset state
+    loading.value = true;
+    error.value = null;
+    bookData.value = null;
+    showCover.value = true;
+    showTagInput.value = false;
+    tagsInput.value = '';
+    showSuccessMessage.value = false;
+    // Fetch new data
+    fetchBookData();
+  }
+}, { immediate: false });
 
 const showTagInput = ref(false);
 const tagsInput = ref('');
@@ -319,7 +337,7 @@ const submitTags = async () => {
     const apiBase = config.public.apiBase || '/api/v1';
     const apiKey = config.public.apiKey as string;
     
-    const response = await $fetch(`${apiBase}/books/${bookData.value.bookid}/tags`, {
+    const response: any = await $fetch(`${apiBase}/books/${bookData.value.bookid}/tags`, {
       method: 'POST',
       headers: {
         'X-API-Key': apiKey,
@@ -357,12 +375,11 @@ const refreshBookData = async () => {
   if (!bookData.value) return;
   
   try {
-    // 重新获取完整的书籍数据，使用 refresh=true 强制刷新缓存
     const config = useRuntimeConfig();
     const apiBase = config.public.apiBase || '/api/v1';
     const apiKey = config.public.apiKey as string;
     
-    const response = await $fetch(`${apiBase}/books/${bookid}?refresh=true`, {
+    const response: any = await $fetch(`${apiBase}/books/${bookid}?refresh=true`, {
       headers: {
         'X-API-Key': apiKey
       }
@@ -374,6 +391,15 @@ const refreshBookData = async () => {
   } catch (err) {
     console.error('Error refreshing book data:', err);
   }
+};
+
+// Navigation functions using Vue Router
+const navigateToTag = (tag: string) => {
+  router.push(`/books/list/tags/${encodeURIComponent(tag)}`);
+};
+
+const navigateToAuthor = (author: string) => {
+  router.push(`/books/list/author/${encodeURIComponent(author)}`);
 };
 </script>
 
