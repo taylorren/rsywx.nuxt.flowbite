@@ -27,5 +27,9 @@
     "vue": "latest",
     "vue-chartjs": "^5.3.2",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0"
   }
 }

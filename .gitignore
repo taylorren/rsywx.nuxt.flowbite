@@ -7,3 +7,9 @@ node_modules
 .env
 dist
 /public/covers/*.webp
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

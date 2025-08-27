@@ -2,10 +2,8 @@
   <div class="min-h-screen py-8">
     <div class="container mx-auto px-4">
 
-      
-      <h1 class="text-3xl font-bold mb-4 dark:text-white">任氏有无轩基本情况一览</h1>
-      
 
+      <h1 class="text-3xl font-bold mb-4 dark:text-white">任氏有无轩基本情况一览</h1>
 
       <!-- 藏书 Group -->
       <h2 class="text-2xl font-semibold mb-2 dark:text-white">藏书信息</h2>
@@ -21,16 +19,20 @@
           <LatestBookCard :latestBook="latestBook" />
         </div>
 
-        <div ref="recentVisitBookRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+        <div ref="recentVisitBookRef"
+          class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <RecentVisitBookCard :book="recentVisitBook?.[0] || null" />
         </div>
-        <div ref="forgetBookRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+        <div ref="forgetBookRef"
+          class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
           <ForgetBookCard :book="forgetBook?.[0] || null" />
         </div>
-        <div ref="todayBooksRef" class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
-          <BookTodayCard :todayBooks="todayBooks || []" />
+        <div ref="todayBooksRef"
+          class="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]">
+          <BookTodayCard :todayBooks="todayBook || []" />
         </div>
-        <div ref="visitStatsRef" class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]">
+        <div ref="visitStatsRef"
+          class="w-full md:w-[calc(100%-0.5rem)] lg:w-[calc(66.666%-0.667rem)] xl:w-[calc(50%-0.75rem)]">
           <VisitStatsCard :visitStats="visitStats" />
         </div>
         <!-- Add more 藏书 cards here -->
@@ -74,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 // 导入组件
 import BookSummaryCard from '~/components/home/BookSummaryCard.vue';
@@ -106,7 +108,7 @@ const {
   randomBook,
   recentVisitBook,
   forgetBook,
-  todayBooks,
+  todayBook,
   refreshRandomBook
 } = appData.books;
 
@@ -139,48 +141,48 @@ onMounted(async () => {
   performanceAnalyzer.startPageLoad();
   loadTimeAnalyzer.startAnalysis();
   performanceAnalyzer.start('Page Mount', 'processing');
-  
 
-  
+
+
   // Track load phases for detailed breakdown
   loadTimeAnalyzer.startPhase('Initial Connection');
-  
+
   // Skip network optimizations to avoid unnecessary preloading
   // loadTimeAnalyzer.startPhase('Network Optimizations');
   // await quickOptimizations();
   // loadTimeAnalyzer.endPhase('Network Optimizations');
-  
+
   // Mark critical path operations
   performanceAnalyzer.markCritical('API: Books Summary');
   performanceAnalyzer.markCritical('API: Latest Book');
-  
+
   // Track external resource loading
   loadTimeAnalyzer.startPhase('External Resources');
   await trackExternalResources();
   loadTimeAnalyzer.endPhase('External Resources');
-  
+
   // Track component rendering
   loadTimeAnalyzer.startPhase('Component Rendering');
   performanceAnalyzer.start('Component Rendering', 'rendering');
-  
+
   try {
     // Track API calls phase
     loadTimeAnalyzer.startPhase('API Calls');
-    
+
     // 使用优化的加载策略
     await timedWithCategory('App Data Loading', 'processing', async () => {
       await appData.loadAllData();
     })();
-    
+
     loadTimeAnalyzer.endPhase('API Calls');
     loadTimeAnalyzer.endPhase('Component Rendering');
     loadTimeAnalyzer.endPhase('Initial Connection');
-    
+
     performanceAnalyzer.end('Component Rendering');
     performanceAnalyzer.end('Page Mount');
-    
 
-    
+
+
   } catch (error) {
     loadTimeAnalyzer.endPhase('API Calls');
     loadTimeAnalyzer.endPhase('Component Rendering');
@@ -200,11 +202,11 @@ async function trackExternalResources() {
     'https://mirrors.creativecommons.org/presskit/icons/nc.svg',
     'https://mirrors.creativecommons.org/presskit/icons/nd.svg'
   ];
-  
+
   for (const resource of externalResources) {
     const resourceName = `External: ${resource.split('/').pop()}`;
     performanceAnalyzer.start(resourceName, 'network', { url: resource });
-    
+
     try {
       await fetch(resource, { method: 'HEAD' });
       performanceAnalyzer.end(resourceName);
@@ -220,21 +222,70 @@ async function trackExternalResources() {
 if (summaryError.value) console.error('Failed to fetch book summary:', summaryError.value);
 if (latestBookError.value) console.error('Failed to fetch latest book:', latestBookError.value);
 
-// Setup meta data
-useHead({
-  title: '任氏有无轩 | 藏书、读书、博客、维客', // 设置页面标题
-  meta: [
-    {
-      name: 'description',
-      content:
-        '任氏有无轩，创立于1989年。其对应站点专注于藏书、读书、博客、维客等构造。是中国大陆不多的质量较高的个人站点。', // 设置页面描述
-    },
-    {
-      name: 'keywords',
-      content: '藏书, 读书，博客，维客，资源，个人', // 设置关键词
-    },
-  ],
-});
+// Setup comprehensive meta data with dynamic statistics
+const setupMetaTags = () => {
+  // Generate dynamic description with current statistics
+  const generateDynamicDescription = () => {
+    const baseDescription = '任氏有无轩，创立于1989年。其对应站点专注于藏书、读书、博客、维客等构造。是中国大陆不多的质量较高的个人站点。'
+
+    // Add statistics if available
+    if (summary.value && readingData.value) {
+      const bookCount = summary.value.bc || 0
+      const readingCount = readingData.value.books_read || 0
+      const reviewCount = readingData.value.reviews_written || 0
+
+      return `${baseDescription}目前收藏图书${bookCount}本，已读${readingCount}本，撰写读书评论${reviewCount}篇。`
+    }
+
+    return baseDescription
+  }
+
+  // Get current URL for canonical and Open Graph
+  const currentUrl = process.env.NODE_ENV === 'production' ? 'https://rsywx.com' : 'http://localhost:3001'
+  const siteImage = process.env.NODE_ENV === 'production' ? 'https://rsywx.com/images/site-logo.png' : 'http://localhost:3001/images/site-logo.png' // Default site image
+
+  useHead({
+    title: '任氏有无轩 | 藏书、读书、博客、维客',
+    meta: [
+      // Basic meta tags
+      { name: 'description', content: generateDynamicDescription() },
+      { name: 'keywords', content: '任氏有无轩,藏书,读书,博客,维客,个人网站,图书收藏,读书笔记,书评' },
+      { name: 'author', content: '任氏有无轩' },
+
+      // Open Graph meta tags for social media sharing
+      { property: 'og:title', content: '任氏有无轩 | 藏书、读书、博客、维客' },
+      { property: 'og:description', content: generateDynamicDescription() },
+      { property: 'og:image', content: siteImage },
+      { property: 'og:url', content: currentUrl },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: '任氏有无轩' },
+      { property: 'og:locale', content: 'zh_CN' },
+
+      // Twitter Card meta tags
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: '任氏有无轩 | 藏书、读书、博客、维客' },
+      { name: 'twitter:description', content: generateDynamicDescription() },
+      { name: 'twitter:image', content: siteImage },
+
+      // Additional meta tags for better SEO
+      { name: 'robots', content: 'index,follow' },
+      { name: 'googlebot', content: 'index,follow' },
+      { name: 'format-detection', content: 'telephone=no' }
+    ],
+    link: [
+      // Canonical URL
+      { rel: 'canonical', href: currentUrl }
+    ]
+  })
+}
+
+// Initial meta setup
+setupMetaTags()
+
+// Watch for data changes and update meta tags dynamically
+watch([summary, readingData], () => {
+  setupMetaTags()
+}, { deep: true })
 
 // Date calculation - client side only
 const currentDate = new Date();

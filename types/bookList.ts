@@ -1,4 +1,6 @@
 // types/book.ts
+export type SearchType = 'title' | 'author' | 'tag' | 'location';
+
 export interface BookListItem {
   id: number;
   bookid: string;

@@ -73,34 +73,15 @@
               </div>
             </div>
           </li>
-          <li class="relative">
-            <button 
-              id="dropdownReadingLink" 
-              @click="toggleReadingDropdown"
+          <li>
+            <a href="/readings/latest" 
               :class="[
-                'flex items-center justify-between w-full py-2 px-3 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 md:w-auto dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent',
+                'block py-2 px-3 rounded-sm md:p-0',
                 isInReadingSection 
-                  ? 'text-blue-700 md:text-blue-700 dark:text-blue-500 md:dark:text-blue-500'
-                  : 'text-gray-900 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500'
+                  ? 'text-blue-700 md:text-blue-700 dark:text-blue-500'
+                  : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 md:dark:hover:bg-transparent'
               ]"
-            >读书
-              <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-              </svg></button>
-            <!-- Dropdown menu -->
-            <div 
-              id="dropdownReading" 
-              :class="[
-                'absolute top-full left-0 z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600',
-                showReadingDropdown ? 'block' : 'hidden'
-              ]"
-            >
-              <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownReadingLink">
-                <li>
-                  <a href="/readings/latest" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">最新评论</a>
-                </li>
-              </ul>
-            </div>
+            >读书</a>
           </li>
           <li>
             <a href="https://blog.rsywx.net" target="_blank" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">博客</a>
@@ -110,8 +91,15 @@
           </li>
         </ul>
       </div>
+      <div class="hidden md:flex items-center space-x-3 flex-1 justify-center max-w-2xl mx-4">
+        <BookSearchBar />
+      </div>
       <div class="flex items-center space-x-3">
-        <a href="#" class="bg-green-500 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center rtl:space-x-reverse">联系站长</a>
+        <NuxtLink 
+          to="/contact" 
+          class="bg-green-500 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center rtl:space-x-reverse"
+          :class="{ 'bg-green-600': route.path === '/contact' }"
+        >联系站长</NuxtLink>
       </div>
     </div>
   </nav>
@@ -120,14 +108,15 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useFlowbite } from '~/composables/useFlowbite';
+import BookSearchBar from '~/components/home/BookSearchBar.vue';
 
 const route = useRoute();
 
 // Dropdown states
 const showBooksDropdown = ref(false);
-const showReadingDropdown = ref(false);
 const showMobileMenu = ref(false);
 
 // Check if current route is in books section
@@ -143,12 +132,6 @@ const isInReadingSection = computed(() => {
 // Toggle dropdown functions
 const toggleBooksDropdown = () => {
   showBooksDropdown.value = !showBooksDropdown.value;
-  showReadingDropdown.value = false;
-};
-
-const toggleReadingDropdown = () => {
-  showReadingDropdown.value = !showReadingDropdown.value;
-  showBooksDropdown.value = false;
 };
 
 const toggleMobileMenu = () => {
@@ -161,9 +144,6 @@ onMounted(() => {
     const target = event.target;
     if (!target.closest('#dropdownNavbarLink') && !target.closest('#dropdownNavbar')) {
       showBooksDropdown.value = false;
-    }
-    if (!target.closest('#dropdownReadingLink') && !target.closest('#dropdownReading')) {
-      showReadingDropdown.value = false;
     }
     if (!target.closest('button[aria-controls="navbar-dropdown"]') && !target.closest('#navbar-dropdown')) {
       showMobileMenu.value = false;
